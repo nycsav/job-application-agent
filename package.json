@@ -1,0 +1,17 @@
+{
+  "name": "job-engine",
+  "version": "1.0.0",
+  "description": "Automated job application engine — Scanner → Materials → Submitter",
+  "type": "module",
+  "scripts": {
+    "scan": "node agents/scanner.mjs",
+    "generate": "node agents/materials.mjs",
+    "submit": "node agents/submitter.mjs",
+    "pipeline": "node orchestrator.mjs",
+    "test": "node lib/test-templates.mjs"
+  },
+  "dependencies": {
+    "docx": "^9.1.1",
+    "googleapis": "^144.0.0"
+  }
+}

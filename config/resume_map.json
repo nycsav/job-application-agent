@@ -1,0 +1,80 @@
+{
+  "_description": "Maps role types to pre-approved resume PDFs. Pipeline picks the right resume — no regeneration needed.",
+  "_usage": "Match incoming role title/JD against clusters below. Use the first matching cluster. Default to 'ai_builder' if unclear.",
+  "resumes": {
+    "ai_builder": {
+      "file": "materials/resumes/Sav_Banerjee_Resume_AI_Builder.pdf",
+      "angle": "Technical AI builder + enterprise transformation leader. Leads with production AI products shipped (trading terminal, intelligence platform, CoE). Heavy on Claude/MCP architecture, financial AI agents, agentic systems.",
+      "best_for": [
+        "Head of AI",
+        "VP AI",
+        "AI Transformation Lead",
+        "AI Architecture",
+        "AI Solutions Architect",
+        "VP AI Solutions Architecture",
+        "Applied AI",
+        "Agentic Solutions Engineer",
+        "Internal AI Lead",
+        "Technology Head of AI",
+        "CTO / Chief Technology Officer",
+        "Chief AI Officer"
+      ],
+      "example_companies": ["Anthropic (technical roles)", "OpenAI (applied AI)", "Confluence", "Jecona", "Ladders", "Willis Re", "Soho Square", "Tribe AI"]
+    },
+    "ai_advisory": {
+      "file": "materials/resumes/Sav_Banerjee_Resume_AI_Advisory.pdf",
+      "angle": "Enterprise AI advisor + C-suite transformation consultant. Leads with advisory practice, Gore/BOI case study, change management, responsible AI governance. More strategic, less technical.",
+      "best_for": [
+        "AI Transformation Consultant",
+        "AI Strategy Consultant",
+        "Digital Transformation Lead",
+        "Management Consultant (AI/Digital)",
+        "Chief Transformation Officer",
+        "VP Digital Transformation",
+        "AI Advisory",
+        "Enterprise AI Consultant",
+        "AI Center of Excellence Lead"
+      ],
+      "example_companies": ["McKinsey", "BCG", "Bain", "Cuesta Partners", "Deloitte", "Accenture", "PE-backed portcos"]
+    },
+    "ai_partnerships": {
+      "file": "materials/resumes/Sav_Banerjee_Resume_AI_Partnerships.pdf",
+      "angle": "Strategic AI partnerships executive. Leads with VP+ relationships, co-sell/channel enablement, go-to-market strategy. Claude/MCP technical depth as differentiator.",
+      "best_for": [
+        "Global Technology Partner Lead",
+        "Strategic Partnerships",
+        "Head of Partnerships",
+        "VP Partnerships",
+        "Business Development (AI platforms)",
+        "Alliance Manager",
+        "Channel Lead",
+        "Partner Solutions Architect",
+        "Head of AI Executive Partnership"
+      ],
+      "example_companies": ["Anthropic (partnerships)", "OpenAI (partnerships)", "Google DeepMind (partnerships)", "Salesforce", "Microsoft"]
+    },
+    "product_marketing": {
+      "file": "materials/resumes/Sav_Banerjee_Resume_Product_Marketing.pdf",
+      "angle": "Product marketing + GTM strategist. Leads with product positioning, launch systems, competitive intelligence, enterprise buyer mapping. AI platform expertise as differentiator.",
+      "best_for": [
+        "Product Marketing Manager",
+        "Senior PMM",
+        "Head of Product Marketing",
+        "VP Product Marketing",
+        "GTM Strategy",
+        "AI Product Manager",
+        "VP AI & Platforms",
+        "Forward Deployed AI",
+        "Growth Strategy",
+        "AI Accelerator"
+      ],
+      "example_companies": ["Stripe", "Veho", "Red Ventures", "Atrium", "Perplexity"]
+    }
+  },
+  "matching_rules": {
+    "priority": "Match by title keywords first, then by company type, then by JD content analysis",
+    "default": "ai_builder",
+    "excluded_companies": ["Perplexity", "BOI", "Board of Innovation"],
+    "notes": "These are Sav's pre-approved PDFs. Do NOT regenerate resumes. Pick the best match and submit the PDF as-is."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "_instructions": "Copy this file to candidate.json and fill in your real data. candidate.json is gitignored — your PII stays local.",
+  "name": "Your Name",
+  "location": "City, State",
+  "email": "your.email@gmail.com",
+  "phone": "555-123-4567",
+  "linkedin": "linkedin.com/in/yourprofile",
+  "websites": ["yoursite.com"],
+  "tagline": "Your professional tagline — 3-4 specializations separated by dots",
+  "current_title": "Your Current Title",
+  "current_company": "Your Company",
+  "years_experience": "X+",
+  "education": {
+    "degree": "B.S. Computer Science",
+    "school": "University Name"
+  },
+  "certifications": [
+    { "name": "Certification Name", "org": "Issuing Org", "year": 2025 }
+  ],
+  "verified_metrics": {
+    "_instructions": "Only include metrics you can back up with data. The agent uses these verbatim.",
+    "example_metric": "150%",
+    "another_metric": "$X MM+"
+  },
+  "public_clients": ["Company A", "Company B"],
+  "exclude_companies": ["Former Employer", "Company You Handle Personally"],
+  "work_authorization": {
+    "authorized_us": true,
+    "requires_sponsorship": false
+  }
+}

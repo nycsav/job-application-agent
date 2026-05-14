@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# === PRIVATE — never commit ===
+# Personal candidate profile (contains PII: phone, email, address)
+config/candidate.json
+
+# Actual resumes and cover letters (contain PII + career history)
+materials/resumes/*.pdf
+materials/cover-letters/*.pdf
+materials/test-run/
+
+# Google API credentials / tokens
+credentials.json
+token.json
+*.token
+
+# Environment variables
+.env
+.env.*
+
+# === Generated / Ephemeral ===
+# Tailored materials (generated per-role, uploaded to Drive)
+materials/generated/
+
+# Claude Code internals
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

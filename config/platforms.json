@@ -1,0 +1,171 @@
+{
+  "_schema": "Platform capability matrix — tells the submitter HOW to submit before it tries. Tier 1 = fastest (MCP/API), Tier 2 = browser automation, Tier 3 = needs human assist.",
+  "platforms": {
+    "linkedin_easy_apply": {
+      "tier": 1,
+      "display_name": "LinkedIn Easy Apply",
+      "method": "chrome_mcp",
+      "capabilities": {
+        "programmatic_upload": true,
+        "form_fill": true,
+        "requires_login": true,
+        "captcha_likely": false,
+        "native_file_picker": false
+      },
+      "known_blockers": [],
+      "notes": "No LinkedIn MCP exists — use Chrome MCP with DOM tools. User must be logged in. Easy Apply filter: f_AL=true"
+    },
+    "indeed": {
+      "tier": 1,
+      "display_name": "Indeed",
+      "method": "mcp",
+      "mcp_tools": ["search_jobs", "get_job_details"],
+      "capabilities": {
+        "programmatic_upload": true,
+        "form_fill": true,
+        "requires_login": true,
+        "captcha_likely": false,
+        "native_file_picker": false
+      },
+      "known_blockers": [],
+      "notes": "Indeed MCP available for search/discovery. Apply may redirect to company ATS."
+    },
+    "dice": {
+      "tier": 1,
+      "display_name": "Dice",
+      "method": "chrome_mcp",
+      "capabilities": {
+        "programmatic_upload": true,
+        "form_fill": true,
+        "requires_login": true,
+        "captcha_likely": false,
+        "native_file_picker": false
+      },
+      "known_blockers": ["MCP tools not loading despite being connected"],
+      "notes": "Dice MCP listed but tools not appearing. Fallback to Chrome MCP."
+    },
+    "ziprecruiter": {
+      "tier": 1,
+      "display_name": "ZipRecruiter",
+      "method": "mcp",
+      "capabilities": {
+        "programmatic_upload": true,
+        "form_fill": true,
+        "requires_login": true,
+        "captcha_likely": false,
+        "native_file_picker": false
+      },
+      "known_blockers": ["MCP available but not yet connected"],
+      "notes": "ZipRecruiter MCP exists in registry. Needs user to connect."
+    },
+    "greenhouse": {
+      "tier": 2,
+      "display_name": "Greenhouse",
+      "method": "chrome_mcp",
+      "capabilities": {
+        "programmatic_upload": true,
+        "form_fill": true,
+        "requires_login": false,
+        "captcha_likely": false,
+        "native_file_picker": false
+      },
+      "known_blockers": [],
+      "url_pattern": "boards.greenhouse.io/*",
+      "notes": "Standardized forms. File inputs accept programmatic upload via Chrome MCP."
+    },
+    "ashby": {
+      "tier": 2,
+      "display_name": "Ashby",
+      "method": "chrome_mcp",
+      "capabilities": {
+        "programmatic_upload": true,
+        "form_fill": true,
+        "requires_login": false,
+        "captcha_likely": false,
+        "native_file_picker": false
+      },
+      "known_blockers": [],
+      "url_pattern": "jobs.ashbyhq.com/*",
+      "notes": "Clean forms, good for automation."
+    },
+    "lever": {
+      "tier": 2,
+      "display_name": "Lever",
+      "method": "chrome_mcp",
+      "capabilities": {
+        "programmatic_upload": true,
+        "form_fill": true,
+        "requires_login": false,
+        "captcha_likely": false,
+        "native_file_picker": false
+      },
+      "known_blockers": [],
+      "url_pattern": "jobs.lever.co/*",
+      "notes": "Standard forms. Usually no login required."
+    },
+    "oracle_hcm": {
+      "tier": 3,
+      "display_name": "Oracle HCM (Taleo/Fusion)",
+      "method": "manual_assist",
+      "capabilities": {
+        "programmatic_upload": false,
+        "form_fill": true,
+        "requires_login": true,
+        "captcha_likely": false,
+        "native_file_picker": true
+      },
+      "known_blockers": [
+        "File upload inputs block programmatic access — opens native macOS Finder",
+        "Email verification required (code sent to candidate email)",
+        "Pre-filled profiles from prior applications may need cleanup"
+      ],
+      "notes": "JPMorgan, many Fortune 500. Can fill text fields via Chrome MCP but resume upload requires human click. Tested 2026-05-14."
+    },
+    "workday": {
+      "tier": 3,
+      "display_name": "Workday",
+      "method": "manual_assist",
+      "capabilities": {
+        "programmatic_upload": false,
+        "form_fill": true,
+        "requires_login": true,
+        "captcha_likely": true,
+        "native_file_picker": true
+      },
+      "known_blockers": [
+        "Account creation often required",
+        "Multi-step wizard with unpredictable DOM",
+        "File uploads use native picker"
+      ],
+      "notes": "Used by many large enterprises. Very inconsistent implementations."
+    },
+    "icims": {
+      "tier": 3,
+      "display_name": "iCIMS",
+      "method": "manual_assist",
+      "capabilities": {
+        "programmatic_upload": false,
+        "form_fill": true,
+        "requires_login": true,
+        "captcha_likely": true,
+        "native_file_picker": true
+      },
+      "known_blockers": ["Account creation", "CAPTCHA common"],
+      "notes": "Heavy enterprise ATS. Account required."
+    },
+    "google_careers": {
+      "tier": 2,
+      "display_name": "Google Careers",
+      "method": "chrome_mcp",
+      "capabilities": {
+        "programmatic_upload": true,
+        "form_fill": true,
+        "requires_login": true,
+        "captcha_likely": false,
+        "native_file_picker": false
+      },
+      "known_blockers": ["Requires Google account login"],
+      "notes": "Google's own ATS. Relatively clean but requires auth."
+    }
+  }
+}

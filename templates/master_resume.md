@@ -1,0 +1,39 @@
+# {{NAME}}
+
+**{{LOCATION}}** | {{EMAIL}} | {{PHONE}} | [{{LINKEDIN}}](https://{{LINKEDIN}}) | [{{WEBSITE_PRIMARY}}](https://{{WEBSITE_PRIMARY}}) | [{{WEBSITE_SECONDARY}}](https://{{WEBSITE_SECONDARY}})
+
+---
+
+## SUMMARY
+
+{{SUMMARY}}
+
+---
+
+## CORE COMPETENCIES
+
+{{COMPETENCIES}}
+
+---
+
+## CERTIFICATIONS
+
+{{CERTIFICATIONS}}
+
+---
+
+## PROFESSIONAL EXPERIENCE
+
+{{EXPERIENCE}}
+
+---
+
+## PORTFOLIO
+
+{{PORTFOLIO}}
+
+---
+
+## EDUCATION
+
+{{EDUCATION}}

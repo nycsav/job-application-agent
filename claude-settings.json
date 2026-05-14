@@ -1,0 +1,42 @@
+{
+  "_instructions": "Copy this file to job-engine/.claude/settings.json after cloning the repo in Claude Code",
+  "permissions": {
+    "allow": [
+      "Read(*)",
+      "Write(job-engine/**)",
+      "Edit(job-engine/**)",
+      "WebFetch",
+      "WebSearch",
+      "mcp__google-sheets__*",
+      "mcp__google-drive__*",
+      "mcp__gmail__*"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "PreToolBatch": [
+      {
+        "description": "Block auto-submission — require human approval before any submit/apply click",
+        "matcher": {
+          "tool_names": ["playwright_click", "mcp__playwright__click", "computer_click"],
+          "conditions": [
+            "element text contains submit/Submit/apply/Apply/send/Send",
+            "AND context indicates a job application form"
+          ]
+        },
+        "action": "block",
+        "message": "SUBMISSION BLOCKED: About to click a Submit/Apply button on a job application. This requires your explicit approval. Please confirm in chat."
+      }
+    ],
+    "PostToolBatch": [
+      {
+        "description": "Log all application actions for audit trail",
+        "matcher": {
+          "tool_names": ["playwright_*", "mcp__playwright__*"]
+        },
+        "action": "log",
+        "message": "Application action logged"
+      }
+    ]
+  }
+}

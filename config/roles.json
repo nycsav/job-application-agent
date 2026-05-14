@@ -1,0 +1,207 @@
+{
+  "_schema": "Each role entry customizes the master templates. Only include fields that DIFFER from candidate.json defaults.",
+  "roles": [
+    {
+      "id": "anthropic-psa",
+      "company": "Anthropic",
+      "title": "Partner Solutions Architect",
+      "status": "materials_ready",
+      "score": 9,
+      "apply_url": "https://boards.greenhouse.io/anthropic",
+      "platform": "greenhouse",
+      "resume_variant": "claude_architect",
+      "summary_override": "Claude Certified Architect and AI transformation leader with 15+ years of enterprise consulting experience, now building production agentic AI systems on Claude and MCP architecture. Proven 75% pilot-to-production conversion rate across Fortune 500 engagements. Designed and deployed financial AI agents on Claude before Anthropic's financial services launch.",
+      "competencies_override": "Claude Architecture | Model Context Protocol (MCP) | Agentic AI Systems | Enterprise AI Deployment | Pilot-to-Production Strategy | AI Center of Excellence Design | LLM Evaluation | RAG Architecture | Multi-Agent Systems | Financial AI Applications | Production AI Operations | Technical Solution Design | Stakeholder & Executive Communication",
+      "cover_letter_hooks": {
+        "opener": "I build production AI systems on Claude. Not proofs of concept. Not slide decks about what Claude could do. Deployed, running, revenue-generating systems.",
+        "why_fit": [
+          "Built Enso Trading Terminal on Claude + MCP before Anthropic's financial services push",
+          "Designed AI pipeline processing 731 documents with 16 validated signals for Fortune 500 manufacturer",
+          "15 years at McCann, Omnicom/DDB, RAPP, BBDO managing $150MM+ for Citi, JPMorgan, Google, Microsoft",
+          "Hold Claude Certified Architect credential and attended Anthropic Financial Services Briefing"
+        ],
+        "closer": "The enterprise AI deployment problem is an architecture problem. I've been solving it on Claude specifically."
+      },
+      "portfolio_focus": ["trading_terminal", "enterprise_ai", "studio"]
+    },
+    {
+      "id": "anthropic-maaia",
+      "company": "Anthropic",
+      "title": "Manager, Applied AI in AI Architecture",
+      "status": "materials_ready",
+      "score": 9,
+      "apply_url": "https://boards.greenhouse.io/anthropic",
+      "platform": "greenhouse",
+      "resume_variant": "claude_architect",
+      "cover_letter_hooks": {
+        "opener": "I've spent the last several years building production AI systems on Claude — not evaluating them from a distance, but architecting, deploying, and maintaining them for Fortune 500 enterprises.",
+        "why_fit": [
+          "CCA credential holder building production Claude + MCP systems daily",
+          "75% pilot-to-production conversion across enterprise engagements",
+          "Multi-agent orchestration and RAG pipelines in live production environments",
+          "AI Center of Excellence design for pharma agency (Heller)"
+        ],
+        "closer": "I've want to help define what applied AI architecture looks like inside Anthropic."
+      },
+      "portfolio_focus": ["trading_terminal", "enterprise_ai", "healthcare"]
+    },
+    {
+      "id": "deepmind-tech-strategy-dir",
+      "company": "Google DeepMind",
+      "title": "Director, Technology Strategy",
+      "status": "materials_ready",
+      "score": 8,
+      "apply_url": "https://www.google.com/about/careers/",
+      "platform": "google_careers",
+      "resume_variant": "google_gemini",
+      "summary_override": "Google Gemini-certified AI strategist and transformation leader with 15+ years bridging enterprise technology strategy and production AI deployment. Built agentic AI systems processing live market data, orchestrating multi-agent workflows, and delivering measurable enterprise outcomes.",
+      "competencies_override": "AI/ML Strategy | Agentic AI Systems | Enterprise Technology Planning | Multi-Agent Orchestration | LLM Evaluation & Deployment | RAG Architecture | Production AI Operations | Financial AI Applications | Stakeholder Management | Cross-functional Leadership | Data-Driven Decision Making",
+      "cover_letter_hooks": {
+        "opener": "I've spent the last several years at the intersection of enterprise technology strategy and production AI deployment — exactly where this role sits.",
+        "why_fit": [
+          "Google Gemini Professional Certificate holder with hands-on agentic AI architecture",
+          "Built production trading intelligence on multi-agent orchestration",
+          "15 years leading strategy across Google, Microsoft, T-Mobile, Citi at top agencies",
+         "75% pilot-to-production rate translating AI vision into measurable enterprise outcomes"
+        ],
+        "closer": "DeepMind's technology strategy needs people who have shipped production AI, not just theorized about it."
+      },
+      "portfolio_focus": ["trading_terminal", "enterprise_ai", "studio"]
+    },
+    {
+      "id": "deepmind-dir-pm-agentic",
+      "company": "Google DeepMind",
+      "title": "Director, Product Management — Gemini Agentic Capabilities",
+      "status": "materials_ready",
+      "score": 9,
+      "apply_url": "https://www.google.com/about/careers/",
+      "platform": "google_careers",
+      "resume_variant": "google_gemini",
+      "cover_letter_hooks": {
+        "opener": "I build agentic AI systems that run in production. The Enso Trading Terminal processes live market data through autonomous agent workflows — and it's been live for months.",
+        "why_fit": [
+          "Google Gemini cert + production agentic systems builder",
+          "Multi-agent orchestration with tool use, context management, human-in-the-loop",
+          "Enterprise deployment: 75% pilot-to-production, 3-month time-to-value",
+          "731-document intelligence pipeline with validated commercial signals"
+        ],
+        "closer": "Gemini's agentic capabilities need product leaders who've built and shipped these systems, not just managed roadmaps about them."
+      },
+      "portfolio_focus": ["trading_terminal", "enterprise_ai", "github"]
+    },
+    {
+      "id": "deepmind-dir-pm-ai-apps",
+      "company": "Google DeepMind",
+      "title": "Director, Product Management — AI Applications",
+      "status": "materials_ready",
+      "score": 8,
+      "apply_url": "https://www.google.com/about/careers/",
+      "platform": "google_careers",
+      "resume_variant": "google_gemini",
+      "cover_letter_hooks": {
+        "opener": "I've spent the last several years building AI applications that people actually use in production — from trading intelligence to market research to enterprise workflow automation.",
+        "why_fit": [
+          "Production AI applications with real users and measurable business impact",
+          "83% reduction in campaign timelines through agentic automation",
+          "150%+ revenue growth delivered for Fortune 500 through AI enablement",
+          "Google Gemini certified with deep multi-platform AI experience"
+        ],
+        "closer": "DeepMind's AI applications need product leaders who understand the full journey from model capability to user value."
+      },
+      "portfolio_focus": ["trading_terminal", "content_engine", "enterprise_ai"]
+    },
+    {
+      "id": "openai-head-exec-partnership",
+      "company": "OpenAI",
+      "title": "Head of AI Executive Partnership",
+      "status": "materials_ready",
+      "score": 8,
+      "apply_url": "https://openai.com/careers",
+      "platform": "ashby",
+      "resume_variant": "executive_partnership",
+      "summary_override": "AI transformation leader with 15+ years building C-suite relationships and delivering production AI systems for Fortune 500 enterprises. Managed $150MM+ portfolio across financial services, technology, and healthcare. Proven ability to translate AI capabilities into executive-level value propositions that drive enterprise adoption.",
+      "cover_letter_hooks": {
+        "opener": "I've spent 15 years in the room with C-suite executives at Citi, JPMorgan Chase, Google, Microsoft, and Pfizer — doing not presenting decks, but building the strategic partnerships that drive enterprise technology adoption.",
+        "why_fit": [
+          "$150MM+ portfolio management across Fortune 500 C-suite relationships",
+          "75% pilot-to-production: translating AI vision into executive-approved deployments",
+          "Built financial AI trading terminal — production proof of enterprise AI deployment",
+          "Agency pedigree: McCann, Omnicom, RAPP, Publicis — enterprise relationship architecture"
+        ],
+        "closer": "Enterprise AI adoption is an executive trust problem. I've been solving it for 15 years."
+      },
+      "portfolio_focus": ["enterprise_ai", "trading_terminal", "studio"]
+    },
+    {
+      "id": "openai-strategic-partnerships",
+      "company": "OpenAI",
+      "title": "Strategic Global Partnerships",
+      "status": "materials_ready",
+      "score": 8,
+      "apply_url": "https://openai.com/careers",
+      "platform": "ashby",
+      "resume_variant": "partnerships",
+      "cover_letter_hooks": {
+        "opener": "I build the partnerships that turn AI platforms into enterprise infrastructure. $150MM+ in client portfolio management, C-suite relationships at Citi, JPMorgan, Google, and Microsoft.",
+        "why_fit": [
+          "Strategic partnership architecture across Fortune 500 accounts",
+          "Production AI deployment with 75% conversion and 3-month time-to-value",
+          "Cross-functional leadership of 15+ person teams across technology and strategy",
+          "Built AI exablement programs generating 150%+ revenue growth"
+        ],
+        "closer": "OpenAI's global partnerships need people who can architect enterprise relationships, not just manage them."
+      },
+      "portfolio_focus": ["enterprise_ai", "studio"]
+    },
+    {
+      "id": "openai-applied-ai-solutions",
+      "company": "OpenAI",
+      "title": "Applied AI Solutions",
+      "status": "materials_ready",
+      "score": 8,
+      "apply_url": "https://openai.com/careers",
+      "platform": "ashby",
+      "resume_variant": "applied_ai",
+      "cover_letter_hooks": {
+        "opener": "I build AI solutions that run in production. Not demos. Not pilots that stall. Deployed systems generating measurable business value.",
+        "why_fit": [
+          "Production agentic systems: trading terminal, market intelligence, workflow automation",
+          "75% pilot-to-production across enterprise engagements",
+          "RAG architecture, multi-agent orchestration, LLM evaluation in live environments",
+          "AI Center of Excellence design for pharma (Heller Agency)"
+        ],
+        "closer": "Applied AI needs builders who understand both the architecture and the enterprise context. I do both."
+      },
+      "portfolio_focus": ["trading_terminal", "enterprise_ai", "healthcare"]
+    },
+    {
+      "id": "cuesta-partners",
+      "company": "Cuesta Partners",
+      "title": "AI & Digital Transformation Consultant",
+      "status": "materials_ready",
+      "score": 8,
+      "apply_url": "https://www.cuestapartners.com/careers",
+      "platform": "lever",
+      "resume_variant": "consulting",
+      "summary_override": "Enterprise AI transformation leader and certified architect with 15+ years of management consulting and technology strategy experience across Fortune 500 organizations. Proven track record of designing and deploying production AI systems — from pilot through enterprise-wide rollout.",
+      "competencies_override": "Enterprise AI Transformation | Management Consulting | Production AI Deployment | AICenter of Excellence Design | Pilot-to-Production Strategy | Agentic AI Systems | Client Relationship Management | Cross-Functional Team Leadership | C-Suite Communication | Financial Services | Healthcare/Pharma",
+      "cover_letter_hooks": {
+        "opener": "I've spent 15 years in enterprise consulting and the last several building the AI systems that most consultancies only advise on.",
+        "why_fit": [
+          "15 years at McCann, Omnicom/DDB, RAPP, BBDO — deep consulting methodology",
+          "Production AI deployment: 75% pilot-to-production, 3-month time-to-value",
+          "AI Center of Excellence design for pharma agency with Eli Lilly and Pfizer",
+          "$150MM+ portfolio across Citi, JPMorgan, Google, Microsoft"
+        ],
+        "closer": "Cuesta needs consultants who can both architect the AI strategy and build the systems that deliver on it."
+      },
+      "portfolio_focus": ["enterprise_ai", "healthcare", "studio"]
+    }
+  ],
+  "google_sheet": {
+    "id": "1Wd0x_0fEAyScgMKB9neneuMIo3Sgln-CMytWMF8m6eI",
+    "jobs_tab_gid": 351451352,
+    "high_profile_tab_gid": 1913610180
+  },
+  "google_drive_folder_id": "1OOsMcQMegAUg5Ezy47rqiPh7ZAnBZHto"
+}
