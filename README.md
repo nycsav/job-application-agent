@@ -146,9 +146,62 @@ Each role is scored 0-10 across 5 dimensions:
 - **Screenshot audit trail** — captures form state before submission
 - **Deduplication** — checks Google Sheet before applying to prevent duplicates
 
+## Claude Code Integration Patterns
+
+This project is built on [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and uses several agentic patterns worth highlighting:
+
+### MCP (Model Context Protocol) Connectors
+
+The pipeline uses multiple MCP servers simultaneously — each one gives Claude direct API access to a service without browser automation:
+
+- **Gmail MCP** — scans LinkedIn/Indeed alert emails, extracts job details, applies processed labels
+- **Google Sheets MCP** — reads/writes the job tracker (scores, statuses, Drive links)
+- **Google Drive MCP** — uploads tailored resumes and cover letters directly
+- **Indeed MCP** — searches jobs and pulls full JD details via API
+- **Chrome MCP** — DOM-aware browser automation for ATS form filling (Greenhouse, Lever, etc.)
+
+The key insight: MCP connectors are dramatically faster and more reliable than browser automation. A Gmail search via MCP takes ~1 second; the same search via browser automation takes 15-20 seconds with scrolling, clicking, and screenshot parsing. We use browser automation only when no MCP exists (LinkedIn) or when the ATS requires visual interaction.
+
+### Parallel Agent Architecture (Planned)
+
+The current pipeline runs sequentially: scan → score → generate → submit. The architecture supports parallelism at two levels:
+
+1. **Batch scoring** — score multiple roles simultaneously using Claude Code's Task tool to spawn parallel subagents. Each subagent gets one role + the candidate profile and returns a score independently.
+
+2. **Parallel materials generation** — generate tailored resumes for multiple score-8+ roles concurrently. Each subagent selects the appropriate resume cluster, generates the cover letter, and uploads to Drive.
+
+3. **Multi-platform submission** — submit to multiple Tier 1 platforms (LinkedIn Easy Apply, Indeed) in parallel, with a shared deduplication check against the Google Sheet.
+
+### Scheduled Routines
+
+Claude Code Routines run the scanner on a cron schedule:
+
+```bash
+# Scan at 8 AM and 5 PM weekdays
+claude routine add job-scanner \
+  --schedule "0 8,17 * * 1-5" \
+  --prompt "$(cat routines/daily-scan.md)"
+```
+
+Each routine execution is a fresh Claude session that reads the current config, scans all sources, scores new roles, and sends an email summary — no persistent process needed.
+
+### Platform-Aware Submission
+
+The submitter agent reads `config/platforms.json` to determine HOW to submit before attempting it. This avoids wasting cycles on sites that will block automation:
+
+```
+Tier 1 (MCP/API):     LinkedIn Easy Apply, Indeed, Dice
+Tier 2 (Chrome MCP):  Greenhouse, Ashby, Lever
+Tier 3 (Manual):      Oracle HCM, Workday, iCIMS
+```
+
+This tiering was discovered empirically — Oracle HCM (used by JPMorgan, many Fortune 500) blocks programmatic file uploads entirely, opening a native OS file picker that no browser automation can interact with.
+
 ## Built With
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — agent orchestration
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — agent orchestration and MCP integration
+- [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) — direct API access to Gmail, Google Sheets, Google Drive, Indeed
+- [Claude in Chrome](https://chromewebstore.google.com/detail/claude-in-chrome/) — DOM-aware browser automation for ATS form filling
 - [Google Sheets API](https://developers.google.com/sheets/api) — application tracking
 - [Google Drive API](https://developers.google.com/drive/api) — materials storage
 - [docx](https://www.npmjs.com/package/docx) — ATS-optimized document generation
