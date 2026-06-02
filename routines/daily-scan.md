@@ -5,31 +5,30 @@ EXCLUSIONS — NEVER scan, score, log, or generate materials for:
 - BOI / Board of Innovation (Sav's former employer — permanently blacklisted)
 
 STEP 1 — SCAN GMAIL FOR JOB ALERTS
-ALL EMAIL OPERATIONS USE: the native Gmail MCP → sav@ensopartners.co
-Job alerts from LinkedIn/Indeed/Glassdoor are auto-forwarded here from sav.banerjee@gmail.com via Gmail filter.
+ALL EMAIL OPERATIONS USE: the native Gmail MCP connected to sav@ensopartners.co
+Job alerts from LinkedIn/Indeed/Glassdoor/other platforms arrive at sav.banerjee@gmail.com and are forwarded to this inbox.
 Do NOT use Composio or gmail-personal — those are deprecated.
 
-Search sav.banerjee@gmail.com for emails received in the last 8 hours using these 4 cluster-aligned keyword groups:
+Search for emails received in the last 8 hours using these BROAD, PLATFORM-AGNOSTIC queries.
+These are designed to catch ANY job-related email regardless of source — LinkedIn, Indeed, Glassdoor, Dice, ZipRecruiter, Ladders, Hired, Wellfound, Otta, Jack & Jill, recruiter outreach, or any new platform.
 
-CLUSTER 1 — ai_transformation (leadership & org-level AI change):
-- subject:(VP AI OR Director AI OR Head of AI OR Chief AI Officer OR AI Program Director OR AI transformation OR digital transformation AI OR enterprise AI strategy)
-- from:linkedin.com subject:(VP OR Director OR Head) subject:(AI OR artificial intelligence OR transformation)
+QUERY GROUP A — Job alert digests from any platform:
+- from:(indeed.com OR linkedin.com OR glassdoor.com OR dice.com OR ziprecruiter.com OR ladders.com OR hired.com OR wellfound.com OR otta.com OR jackandjill.ai OR getro.com OR lever.co OR greenhouse.io) newer_than:8h
+- subject:(job alert OR new jobs OR jobs for you OR job recommendation OR role match OR career opportunity) newer_than:8h
 
-CLUSTER 2 — ai_architecture (hands-on technical AI build):
-- subject:(Solutions Architect AI OR AI Architect OR Principal AI Engineer OR Applied AI OR Technical AI Lead OR ML platform OR agentic systems OR Claude OR LLM OR AI infrastructure)
-- from:linkedin.com subject:(architect OR engineer OR principal) subject:(AI OR ML OR LLM)
+QUERY GROUP B — Title-based searches (platform-agnostic):
+- subject:(VP AI OR Director AI OR Head of AI OR Chief AI Officer OR AI transformation OR enterprise AI strategy) newer_than:8h
+- subject:(Solutions Architect OR AI Architect OR Principal AI OR Applied AI OR agentic OR Claude OR LLM) newer_than:8h
+- subject:(Partner Director OR Alliance Manager OR Strategic Partnerships OR BD AI OR ecosystem) newer_than:8h
+- subject:(AI Strategy OR AI Advisory OR AI Consulting OR Management Consulting AI OR Digital Strategy) newer_than:8h
 
-CLUSTER 3 — ai_partnerships (BD, alliances, partner ecosystem):
-- subject:(Partner Director AI OR Alliance Manager OR BD AI OR Strategic Partnerships AI OR Partner Success OR channel partner AI OR ecosystem)
-- from:linkedin.com subject:(partner OR alliance OR business development) subject:(AI OR technology)
+QUERY GROUP C — Recruiter outreach (any sender):
+- from:(recruiter OR talent OR hiring OR staffing OR headhunter OR search OR heidrick OR korn OR spencer OR egon) subject:(AI OR opportunity OR role OR position OR candidate) newer_than:8h
+- subject:(reaching out OR exciting opportunity OR perfect fit OR open role OR we think you) (AI OR strategy OR director OR VP) newer_than:8h
+- to:sav.banerjee@gmail.com newer_than:8h -from:linkedin.com -from:indeed.com -from:glassdoor.com -category:promotions -category:social
 
-CLUSTER 4 — ai_strategy_consulting (advisory & consulting):
-- subject:(AI Strategy Consultant OR AI Advisory OR Strategy Director AI OR Management Consulting AI OR Digital Strategy OR AI consulting)
-- from:linkedin.com subject:(consultant OR advisory OR strategy) subject:(AI OR digital OR transformation)
-
-CATCH-ALL (recruiter outreach that may not match a cluster):
-- from:(recruiter OR talent OR hiring) subject:(AI OR artificial intelligence OR opportunity)
-- from:indeed.com subject:(job OR alert OR recommendation) subject:(AI OR strategy OR director OR VP)
+QUERY GROUP D — Newsletter hiring sections:
+- from:(substack.com OR beehiiv.com OR every.to OR a16z.com) subject:(hiring OR open roles OR founding team OR we're building) newer_than:8h
 
 For each matching thread, use get_thread to read the full email body. Tag each result with its matching cluster (or "unclassified" for catch-all matches).
 
@@ -137,6 +136,12 @@ GUARDRAILS:
 - Never mention Gore by name in any public-facing materials — use "Global Materials Manufacturer"
 - Never scan, score, log, or generate materials for Perplexity or BOI.
 - Deduplication is mandatory — never create duplicate tracker rows or duplicate materials.
+- BATCH LIMIT: Max 7 submissions per session. After 7, STOP and send summary to Sav.
+- PRE-LOG RULE: Every application must have a row in the tracker with Status="Queued" BEFORE the submit button is clicked. Update to "Applied" only after confirmed submission.
+- MATERIALS TRACKING: For Easy Apply, set Resume Link = "LinkedIn Default Profile" and Cover Letter = "N/A - Easy Apply". For custom apps, use actual Drive links.
+- SESSION ID: Tag every row with the session ID in Notes column for audit trail.
+- NO CONCURRENT SESSIONS: If another session has written rows in the last 30 minutes, halt and alert Sav.
+- SINGLE SOURCE OF TRUTH: The briefing email (Step 7) lists every application with company, role, score, and materials used. LinkedIn confirmation emails are secondary.
 
 Connected Services:
 - Google Sheet ID: 1Wd0x_0fEAyScgMKB9neneuMIo3Sgln-CMytWMF8m6eI (Sav Job Tracker 2026)

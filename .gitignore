@@ -14,6 +14,8 @@ materials/test-run/
 credentials.json
 token.json
 *.token
+config/gmail-credentials.json
+config/gmail-token.json
 
 # Environment variables
 .env
@@ -33,3 +35,15 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# === HARDENED 2026-06-02: keep personal data out of the PUBLIC repo ===
+.secrets/
+.logs/
+.audit/
+output/
+reports/
+staged-applications/
+materials/
+Application_Tracker_2026.xlsx
+.~lock.*#
+/*.docx

@@ -3,17 +3,16 @@
  * Materials Generator Agent
  *
  * WHAT IT DOES:
- * 1. Reads roles.json for roles needing materials (status !== 'materials_ready')
- * 2. Uses template engine to generate resume + cover letter markdown
- * 3. Converts to .docx via docx-builder
- * 4. Uploads to Google Drive folder
- * 5. Updates roles.json status and Google Sheet with Drive links
+ * RESUME STRATEGY (two-tier):
+ *   Tier 1: Use pre-approved PDFs from config/resume_map.json (preferred)
+ *   Tier 2: Generate custom .docx via template engine (only if no PDF cluster fits)
+ *
+ * COVER LETTERS: Always generated fresh per role via template engine.
+ *
+ * STATUS: Role status lives in Notion Career Command Center (primary) and
+ * Google Sheet (read-only archive). Check Notion via lib/notion-writer.mjs.
  *
  * DESIGNED FOR: Claude Code subagent (triggered by Scanner or Orchestrator)
- *
- * KEY DESIGN: No individual files are saved locally.
- * Documents are generated in-memory and uploaded directly to Google Drive.
- * Only roles.json is updated on disk.
  */
 
 import { readFile, writeFile } from 'fs/promises';
@@ -60,7 +59,8 @@ export async function generateMaterialsForRole(roleId) {
  */
 export async function generateAllPending() {
   const { roles } = await loadRoles();
-  const pending = roles.filter(r => r.status !== 'materials_ready' && r.cover_letter_hooks);
+  // Filter roles that have cover letter hooks defined but no Drive links yet
+  const pending = roles.filter(r => r.cover_letter_hooks && !r.drive_resume_url);
 
   if (pending.length === 0) {
     console.log('[Materials] No pending roles need materials.');
@@ -106,11 +106,11 @@ export async function updateRoleStatus(roleId, status, extraFields = {}) {
 // 1. Read config/roles.json
 // 2. For each role where status !== 'materials_ready':
 //    a. Call generateMaterialsForRole(roleId) to get buffers
-//    b. Upload resume .docx to Google Drive folder (ID in roles.json)
-//    c. Upload cover letter .docx to Google Drive folder
-//    d. Get the Drive file URLs
-//    e. Update roles.json with: status='materials_ready', drive_resume_url, drive_cover_url
-//    f. Update Google Sheet row with Drive links
+//    b. PRIMARY: Upload .docx to Notion page via File Upload API (2-step: upload → attach)
+//    c. FALLBACK: Upload to Google Drive folder (legacy, being retired)
+//    d. Get the file URLs (Notion page URL or Drive URL)
+//    e. Update roles.json with: status='materials_ready', notion_page_url
+//    f. Update Notion Career Command Center row with file links
 //
 // 3. If a new role was added by Scanner with no cover_letter_hooks:
 //    a. Read the job description from the career page (web_fetch)
@@ -121,8 +121,9 @@ export async function updateRoleStatus(roleId, status, extraFields = {}) {
 //    c. Save the hooks to roles.json
 //    d. Then generate materials as above
 //
-// Google Drive folder: 1OOsMcQMegAUg5Ezy47rqiPh7ZAnBZHto
-// Google Sheet: 1Wd0x_0fEAyScgMKB9neneuMIo3Sgln-CMytWMF8m6eI
+// PRIMARY: Notion Career Command Center (DB: 8ce2a0e3-0ab3-4416-bcfe-81295f4e4991)
+// ARCHIVE: Google Drive folder: 1OOsMcQMegAUg5Ezy47rqiPh7ZAnBZHto (being retired)
+// ARCHIVE: Google Sheet: 1Wd0x_0fEAyScgMKB9neneuMIo3Sgln-CMytWMF8m6eI (read-only)
 
 // ─── Standalone execution ────────────────────────────────────────
 

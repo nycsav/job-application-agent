@@ -18,6 +18,16 @@
 import { readFile, writeFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import {
+  preFlightCheck,
+  generatePreSubmitRow,
+  generatePostSubmitUpdate,
+  incrementSubmissionCount,
+  checkBatchLimit,
+  getSessionId,
+  generateBriefingEmail,
+  MAX_BATCH_SIZE
+} from '../lib/safety-guards.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -179,7 +189,16 @@ export function getCandidateFormData(candidate) {
  * Generates a submission plan for a role
  * Returns structured instructions for Claude Code / Playwright
  */
-export async function createSubmissionPlan(roleId) {
+/**
+ * Creates a submission plan for a role.
+ *
+ * SAFETY: Runs full pre-flight check before returning a plan.
+ * If any check fails, throws with detailed reason.
+ *
+ * @param {string} roleId - Role ID from roles.json
+ * @param {Array} sheetRows - Current Google Sheet rows (for dedup check). Pass [] to skip dedup.
+ */
+export async function createSubmissionPlan(roleId, sheetRows = []) {
   const rolesRaw = await readFile(join(ROOT, 'config/roles.json'), 'utf-8');
   const { roles, google_drive_folder_id } = JSON.parse(rolesRaw);
   const role = roles.find(r => r.id === roleId);
@@ -192,13 +211,35 @@ export async function createSubmissionPlan(roleId) {
   const candidateRaw = await readFile(join(ROOT, 'config/candidate.json'), 'utf-8');
   const candidate = JSON.parse(candidateRaw);
 
-  // Check exclusion list
-  if (candidate.exclude_companies.some(ex => role.company.toLowerCase().includes(ex.toLowerCase()))) {
-    throw new Error(`${role.company} is on the exclusion list. Skipping.`);
+  // ─── SAFETY: Pre-flight check (dedup + score gate + batch limit + exclusions) ───
+  const preflight = preFlightCheck({
+    sheetRows,
+    company: role.company,
+    title: role.title,
+    score: role.score
+  });
+
+  if (!preflight.canSubmit) {
+    throw new Error(`SUBMISSION BLOCKED:\n${preflight.failures.join('\n')}`);
   }
+
+  if (preflight.warnings.length > 0) {
+    console.warn(`⚠️  Warnings:\n${preflight.warnings.join('\n')}`);
+  }
+
+  // ─── SAFETY: Increment batch counter ───
+  const newCount = incrementSubmissionCount();
+  console.log(`📊 Submission ${newCount}/${MAX_BATCH_SIZE} this session (${getSessionId()})`);
 
   const strategy = PLATFORM_STRATEGIES[role.platform] || PLATFORM_STRATEGIES.custom;
   const formData = getCandidateFormData(candidate);
+
+  // ─── Generate pre-submit row (must be written to sheet BEFORE clicking submit) ───
+  const preSubmitRow = generatePreSubmitRow(role, {
+    resume_link: role.drive_resume_url || 'LinkedIn Default Profile',
+    cover_letter_link: role.drive_cover_url || 'N/A - Easy Apply',
+    version: role.materials_version || 'default profile'
+  });
 
   return {
     roleId: role.id,
@@ -206,13 +247,26 @@ export async function createSubmissionPlan(roleId) {
     title: role.title,
     apply_url: role.apply_url,
     platform: strategy.name,
-    steps: strategy.steps,
+    steps: [
+      '⚠️ STEP 0: Write pre-submit row to Google Sheet with Status="Queued"',
+      ...strategy.steps,
+      '✅ FINAL: Update sheet row Status from "Queued" → "Applied" + add Applied Date'
+    ],
     selectors: strategy.selectors || {},
     formData,
     resume_drive_url: role.drive_resume_url || null,
     cover_letter_drive_url: role.drive_cover_url || null,
     human_approval_required: true,
-    note: strategy.note || null
+    note: strategy.note || null,
+    // New safety fields
+    session_id: getSessionId(),
+    batch_position: `${newCount}/${MAX_BATCH_SIZE}`,
+    pre_submit_row: preSubmitRow,
+    materials_used: {
+      resume: role.drive_resume_url || 'LinkedIn Default Profile',
+      cover_letter: role.drive_cover_url || 'N/A - Easy Apply',
+      version: role.materials_version || 'default profile'
+    }
   };
 }
 
