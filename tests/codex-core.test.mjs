@@ -5,6 +5,7 @@ import { evaluateHardFilters, parseSalaryCeiling } from '../lib/codex-filters.mj
 import { scoreRole } from '../lib/codex-scorer.mjs';
 import { routeSubmission } from '../lib/codex-submission-router.mjs';
 import { crawlSavedJobs } from '../sources/browser-saved-jobs.mjs';
+import { buildJobSearchQueries } from '../lib/gmail-accounts.mjs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { mkdtemp } from 'node:fs/promises';
 import os from 'node:os';
@@ -59,4 +60,10 @@ test('loads saved jobs from local json input', async () => {
   const result = await crawlSavedJobs({ root, policy });
   assert.equal(result.roles.length, 1);
   assert.equal(result.roles[0].company, 'Acme');
+});
+
+test('builds multi-account Gmail job queries with a time window', () => {
+  const queries = buildJobSearchQueries({ hours: 12 });
+  assert.equal(queries.every((query) => query.includes('newer_than:12h')), true);
+  assert.equal(queries.some((query) => query.includes('linkedin.com')), true);
 });

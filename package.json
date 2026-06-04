@@ -6,6 +6,7 @@
   "scripts": {
     "codex:pipeline": "node agents/codex-orchestrator.mjs",
     "codex:test": "node --test tests/codex-core.test.mjs",
+    "codex:gmail": "node agents/multi-gmail-scanner.mjs --write-input",
     "scan": "node agents/scanner.mjs",
     "generate": "node agents/materials.mjs",
     "submit": "node agents/submitter.mjs",

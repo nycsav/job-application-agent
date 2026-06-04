@@ -1,0 +1,18 @@
+{
+  "accounts": [
+    {
+      "id": "work",
+      "email": "sav@ensopartners.co",
+      "credentialsPath": "config/gmail/work-credentials.json",
+      "tokenPath": "config/gmail/work-token.json",
+      "enabled": true
+    },
+    {
+      "id": "personal",
+      "email": "sav.banerjee@gmail.com",
+      "credentialsPath": "config/gmail/personal-credentials.json",
+      "tokenPath": "config/gmail/personal-token.json",
+      "enabled": true
+    }
+  ]
+}
