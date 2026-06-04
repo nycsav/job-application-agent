@@ -49,3 +49,18 @@ The first implementation pass is stage-only. It scores roles, generates local ma
 - Machine-readable policy: `config/codex-learning-policy.json`
 
 The current feedback policy rewards the sequence: extract JD, compare actual resume text, explain the resume choice, ask for cover-letter positioning, fill only after approval, stop at final review, and archive processed source emails.
+
+## Strategic Archetype Scoring
+
+Approved target archetypes live in `config/codex-role-archetypes.json` and are used by `lib/codex-archetypes.mjs`.
+
+| Archetype | Priority | Resume Route |
+| --- | --- | --- |
+| Forward-Deployed AI Strategist / Solution Principal | Highest | Forward-Deployed AI Architect |
+| VP / Director AI Transformation | Highest | AI Advisory, with MD Managed Services as secondary |
+| Lead AI Consultant / Principal AI Advisor | Highest | AI Advisory |
+| Agentic AI Platform / AI Solutions Architect | High | Forward-Deployed AI Architect |
+| AI CoE / Managed Services / Implementation Partner | High | MD Managed Services |
+| AI Product Strategy / GTM / Partnerships | Medium-High | PMM / GTM |
+
+The role scorer now returns the best archetype, strategic-fit band, top archetype matches, and the normal 0-10 score. Resume routing uses the winning archetype before falling back to generic keyword rules.

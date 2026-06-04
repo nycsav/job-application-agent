@@ -1,0 +1,198 @@
+{
+  "version": "2026-06-04",
+  "description": "Canonical target-role archetypes for Sav's job search. Used for strategic fit scoring and resume routing.",
+  "archetypes": [
+    {
+      "id": "forward_deployed_ai_strategist",
+      "label": "Forward-Deployed AI Strategist / Solution Principal",
+      "priority": "highest",
+      "resumeCluster": "ai_builder",
+      "bestResume": "Forward-Deployed AI Architect",
+      "titleSignals": [
+        "forward-deployed",
+        "forward deployed",
+        "solution principal",
+        "solutions principal",
+        "deployment strategist",
+        "ai strategist",
+        "agentic solution"
+      ],
+      "bodySignals": [
+        "client stakeholders",
+        "technical direction",
+        "solution architecture",
+        "agentic workflows",
+        "mcp",
+        "pilot-to-production",
+        "production systems",
+        "enterprise deployment"
+      ]
+    },
+    {
+      "id": "vp_director_ai_transformation",
+      "label": "VP / Director AI Transformation",
+      "priority": "highest",
+      "resumeCluster": "ai_advisory",
+      "secondaryResumeCluster": "ai_consulting",
+      "bestResume": "AI Advisory or MD Managed Services",
+      "titleSignals": [
+        "vp ai",
+        "vice president ai",
+        "director ai",
+        "director of ai",
+        "head of ai",
+        "ai transformation",
+        "digital transformation",
+        "chief ai officer"
+      ],
+      "bodySignals": [
+        "operating model",
+        "enterprise ai",
+        "ai roadmap",
+        "c-suite",
+        "executive stakeholders",
+        "change management",
+        "governance",
+        "value realization"
+      ]
+    },
+    {
+      "id": "lead_ai_consultant",
+      "label": "Lead AI Consultant / Principal AI Advisor",
+      "priority": "highest",
+      "resumeCluster": "ai_advisory",
+      "bestResume": "AI Advisory",
+      "titleSignals": [
+        "lead ai consultant",
+        "principal ai consultant",
+        "principal ai advisor",
+        "ai advisory",
+        "ai strategy consultant",
+        "enterprise ai consultant",
+        "management consultant"
+      ],
+      "bodySignals": [
+        "advisory",
+        "consulting",
+        "workshops",
+        "readiness assessment",
+        "roadmap",
+        "business case",
+        "executive enablement",
+        "strategy-to-ship"
+      ]
+    },
+    {
+      "id": "agentic_ai_platform_architect",
+      "label": "Agentic AI Platform / AI Solutions Architect",
+      "priority": "high",
+      "resumeCluster": "ai_builder",
+      "bestResume": "Forward-Deployed AI Architect",
+      "titleSignals": [
+        "ai solutions architect",
+        "solutions architect",
+        "agentic ai platform",
+        "ai platform architect",
+        "principal ai architect",
+        "applied ai architect",
+        "agentic architect"
+      ],
+      "bodySignals": [
+        "multi-agent",
+        "agent orchestration",
+        "langgraph",
+        "mcp",
+        "rag",
+        "evaluation",
+        "observability",
+        "cloud-native",
+        "python",
+        "typescript"
+      ]
+    },
+    {
+      "id": "ai_coe_managed_services",
+      "label": "AI CoE / Managed Services / Implementation Partner",
+      "priority": "high",
+      "resumeCluster": "ai_consulting",
+      "bestResume": "MD Managed Services",
+      "titleSignals": [
+        "ai center of excellence",
+        "ai coe",
+        "managed services",
+        "implementation partner",
+        "ai delivery lead",
+        "ai adoption",
+        "embedded ai operator",
+        "fractional ai"
+      ],
+      "bodySignals": [
+        "center of excellence",
+        "managed services",
+        "implementation",
+        "enablement",
+        "governance",
+        "operating model",
+        "deployment playbooks",
+        "ongoing operations"
+      ]
+    },
+    {
+      "id": "ai_product_gtm_partnerships",
+      "label": "AI Product Strategy / GTM / Partnerships",
+      "priority": "medium-high",
+      "resumeCluster": "product_marketing",
+      "bestResume": "PMM / GTM",
+      "titleSignals": [
+        "ai product strategy",
+        "gtm",
+        "go-to-market",
+        "product marketing",
+        "strategic partnerships",
+        "ai partnerships",
+        "partner solutions",
+        "growth strategy"
+      ],
+      "bodySignals": [
+        "positioning",
+        "launch",
+        "buyer enablement",
+        "partnerships",
+        "platform strategy",
+        "competitive intelligence",
+        "sales enablement",
+        "enterprise deals"
+      ]
+    }
+  ],
+  "globalPositiveSignals": [
+    "agentic",
+    "mcp",
+    "claude",
+    "langgraph",
+    "rag",
+    "enterprise ai",
+    "fortune 500",
+    "pilot-to-production",
+    "production ai",
+    "ai transformation",
+    "c-suite",
+    "healthcare",
+    "pharma",
+    "financial services",
+    "b2b tech",
+    "manufacturing"
+  ],
+  "globalPenaltySignals": [
+    "junior",
+    "associate",
+    "backend engineer",
+    "frontend engineer",
+    "software engineer ii",
+    "software engineer iii",
+    "requires computer science degree",
+    "computer science degree required",
+    "kubernetes administrator",
+    "terraform administrator"
+  ]
+}

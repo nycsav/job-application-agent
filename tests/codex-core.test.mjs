@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { normalizeRole } from '../lib/codex-role.mjs';
 import { evaluateHardFilters, parseSalaryCeiling } from '../lib/codex-filters.mjs';
 import { scoreRole } from '../lib/codex-scorer.mjs';
+import { classifyRoleArchetypes } from '../lib/codex-archetypes.mjs';
+import { chooseResumeCluster } from '../lib/codex-resume-router.mjs';
 import { routeSubmission } from '../lib/codex-submission-router.mjs';
 import { crawlSavedJobs } from '../sources/browser-saved-jobs.mjs';
 import { buildJobSearchQueries } from '../lib/gmail-accounts.mjs';
@@ -44,6 +46,41 @@ test('scores strong AI strategy roles at materials threshold', () => {
     description: 'Lead AI strategy and transformation. Agentic AI architecture, C-suite advisory, enterprise AI strategy, pilot to production, consulting.'
   });
   assert.equal(scoreRole(role).score >= policy.thresholds.materials, true);
+});
+
+test('classifies SoftServe-style roles as forward-deployed solution principal', () => {
+  const role = normalizeRole({
+    company: 'SoftServe',
+    title: 'Agentic Solution Principal',
+    location: 'Remote',
+    description: 'Set technical direction for agentic workflows, MCP tools, client stakeholders, solution architecture, production systems, and enterprise deployment.'
+  });
+  const classification = classifyRoleArchetypes(role);
+  assert.equal(classification.best.id, 'forward_deployed_ai_strategist');
+  assert.equal(classification.best.resumeCluster, 'ai_builder');
+  assert.equal(classification.strategicFit >= 8, true);
+});
+
+test('scores and routes approved archetypes to matching resume clusters', async () => {
+  const vpTransformation = normalizeRole({
+    company: 'Acme',
+    title: 'VP AI Transformation',
+    location: 'New York',
+    salary: '$240K',
+    description: 'Own enterprise AI roadmap, operating model, C-suite governance, executive stakeholders, and value realization.'
+  });
+  const managedServices = normalizeRole({
+    company: 'Acme',
+    title: 'AI CoE Managed Services Implementation Partner',
+    location: 'Remote',
+    salary: '$220K',
+    description: 'Lead center of excellence, managed services, deployment playbooks, governance, enablement, and ongoing operations.'
+  });
+
+  assert.equal(scoreRole(vpTransformation).archetype.id, 'vp_director_ai_transformation');
+  assert.equal(scoreRole(managedServices).archetype.id, 'ai_coe_managed_services');
+  assert.equal((await chooseResumeCluster(vpTransformation)).cluster, 'ai_advisory');
+  assert.equal((await chooseResumeCluster(managedServices)).cluster, 'ai_consulting');
 });
 
 test('routes high score roles through approval-gated paths', () => {
