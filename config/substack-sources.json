@@ -1,0 +1,85 @@
+{
+  "_comment": "Curated VC/startup Substack feeds monitored daily by agents/substack-scanner.mjs. RSS is fetched from {publication}/feed — no auth required. Add or remove publications freely.",
+  "_added": "2026-05-20",
+  "scan_window_hours": 24,
+  "max_posts_per_feed": 5,
+  "feeds": [
+    {
+      "name": "a16z Build Newsletter",
+      "url": "https://a16zbuild.substack.com/feed",
+      "tier": "primary",
+      "notes": "Source of the original recommendation. Founding-team roles across all stages.",
+      "min_score_to_track": 5
+    },
+    {
+      "name": "Lenny's Newsletter",
+      "url": "https://www.lennysnewsletter.com/feed",
+      "tier": "primary",
+      "notes": "Lenny Rachitsky — heavy PM/growth role circulation.",
+      "min_score_to_track": 5
+    },
+    {
+      "name": "The Generalist",
+      "url": "https://www.generalist.com/feed",
+      "tier": "primary",
+      "notes": "Mario Gabriele — emerging companies, frequent hiring callouts.",
+      "min_score_to_track": 5
+    },
+    {
+      "name": "Not Boring by Packy McCormick",
+      "url": "https://www.notboring.co/feed",
+      "tier": "secondary",
+      "notes": "Strategic essays; occasional portfolio job lists.",
+      "min_score_to_track": 6
+    },
+    {
+      "name": "Stratechery by Ben Thompson",
+      "url": "https://stratechery.com/feed/",
+      "tier": "secondary",
+      "notes": "Lower hit rate for jobs, but flags strategic moves that hint at hiring waves.",
+      "min_score_to_track": 7
+    },
+    {
+      "name": "Every",
+      "url": "https://every.to/rss",
+      "tier": "secondary",
+      "notes": "Bundle of newsletters (Napkin Math, Divinations, etc.). RSS URL verified manually — adjust if 404 persists.",
+      "min_score_to_track": 6,
+      "disabled": true
+    }
+  ],
+  "extraction_hints": {
+    "_comment": "Heuristics for the LLM extractor — what to look for inside a post's content.",
+    "trigger_phrases": [
+      "is hiring",
+      "now hiring",
+      "open roles",
+      "is now hiring",
+      "are hiring",
+      "hiring a",
+      "apply here",
+      "apply to join"
+    ],
+    "required_fields": [
+      "company",
+      "title",
+      "apply_url"
+    ],
+    "optional_fields": [
+      "location",
+      "compensation",
+      "stage",
+      "founder_name"
+    ],
+    "url_allowlist_domains": [
+      "ashbyhq.com",
+      "greenhouse.io",
+      "lever.co",
+      "linkedin.com/jobs",
+      "careers.google.com",
+      "careers.",
+      "jobs.",
+      "workatastartup.com"
+    ]
+  }
+}

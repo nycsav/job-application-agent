@@ -3,7 +3,8 @@
   "_usage": "Match incoming role title/JD against clusters below. Use the first matching cluster. Default to 'ai_builder' if unclear.",
   "resumes": {
     "ai_builder": {
-      "file": "materials/resumes/Sav_Banerjee_Resume_AI_Builder.pdf",
+      "file": "materials/resumes/Sav_Banerjee_Resume_ForwardDeployed_2026.pdf",
+      "_fixed_2026-06-03": "Was pointing at Sav_Banerjee_Resume_AI_Builder.pdf which does NOT exist on disk. Repointed to the ForwardDeployed resume (the technical builder variant that exists).",
       "angle": "Technical AI builder + enterprise transformation leader. Leads with production AI products shipped (trading terminal, intelligence platform, CoE). Heavy on Claude/MCP architecture, financial AI agents, agentic systems.",
       "best_for": [
         "Head of AI",
@@ -37,8 +38,25 @@
       ],
       "example_companies": ["McKinsey", "BCG", "Bain", "Cuesta Partners", "Deloitte", "Accenture", "PE-backed portcos"]
     },
+    "ai_consulting": {
+      "file": "materials/resumes/Sav_Banerjee_Resume_2026_MD_ManagedServices.pdf",
+      "_added_2026-06-03": "New route for consulting / contract / fractional / Managed-Services roles (supports the >$85/hr contract track). Uses the MD/Managed-Services resume that existed on disk but was never mapped.",
+      "angle": "Managing-Director / fractional AI consulting. Leads with principal-led delivery, managed-services model, P&L of an AI studio, multi-client F500 delivery. Best for hourly/contract and boutique consulting engagements.",
+      "best_for": [
+        "AI Consultant",
+        "AI Deployment Strategist",
+        "Fractional AI Lead",
+        "Contract AI Architect",
+        "Independent AI Consultant",
+        "Managed Services AI",
+        "AI Delivery Lead",
+        "Interim Head of AI"
+      ],
+      "example_companies": ["A.Team", "Catalant", "BTG", "Toptal", "Dice contract", "boutique consultancies"]
+    },
     "ai_partnerships": {
-      "file": "materials/resumes/Sav_Banerjee_Resume_AI_Partnerships.pdf",
+      "file": "materials/resumes/Sav_Banerjee_Resume_2026_PMM_v2.pdf",
+      "_fixed_2026-06-03": "Was pointing at Sav_Banerjee_Resume_AI_Partnerships.pdf which does NOT exist on disk. No dedicated partnerships resume exists yet — temporarily routed to PMM_v2 (nearest GTM/relationship match). TODO: build a real partnerships resume.",
       "angle": "Strategic AI partnerships executive. Leads with VP+ relationships, co-sell/channel enablement, go-to-market strategy. Claude/MCP technical depth as differentiator.",
       "best_for": [
         "Global Technology Partner Lead",

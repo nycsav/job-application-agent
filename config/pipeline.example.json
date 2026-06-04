@@ -1,0 +1,17 @@
+{
+  "_description": "Pipeline configuration for Job Application Agent. Copy to pipeline.json and fill in your own values. pipeline.json is gitignored — never commit the live webhook URL.",
+  "sheets_webhook_url": "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_DEPLOYMENT_ID/exec",
+  "sheet_id": "YOUR_GOOGLE_SHEET_ID",
+  "drive_folder_id": "YOUR_DRIVE_FOLDER_ID",
+  "gmail_account": "you@gmail.com",
+  "briefing_email": "you@example.com",
+  "tabs": {
+    "jobs": "Jobs",
+    "high_profile": "High Profile"
+  },
+  "score_thresholds": {
+    "min_sheet": 5,
+    "high_profile": 7,
+    "auto_materials": 8
+  }
+}

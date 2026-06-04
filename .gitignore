@@ -17,6 +17,9 @@ token.json
 config/gmail-credentials.json
 config/gmail-token.json
 
+# Pipeline config — contains live Apps Script webhook URL + infra IDs
+config/pipeline.json
+
 # Environment variables
 .env
 .env.*
