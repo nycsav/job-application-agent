@@ -1,0 +1,81 @@
+{
+  "version": "2026-06-04",
+  "purpose": "Local feedback policy for improving future job-application runs without formal model training.",
+  "rewardModel": {
+    "positive": [
+      {
+        "signal": "full_jd_extracted_before_materials",
+        "reward": 3
+      },
+      {
+        "signal": "actual_resume_text_compared_against_jd",
+        "reward": 4
+      },
+      {
+        "signal": "resume_recommendation_explained_to_user",
+        "reward": 3
+      },
+      {
+        "signal": "cover_letter_direction_requested_before_generation",
+        "reward": 3
+      },
+      {
+        "signal": "application_paused_at_final_review",
+        "reward": 5
+      },
+      {
+        "signal": "processed_job_email_labeled_and_archived",
+        "reward": 2
+      }
+    ],
+    "negative": [
+      {
+        "signal": "application_started_before_resume_match",
+        "penalty": 5
+      },
+      {
+        "signal": "exact_keyword_matching_used_without_archetype_fit",
+        "penalty": 3
+      },
+      {
+        "signal": "cover_letter_written_without_user_positioning",
+        "penalty": 4
+      },
+      {
+        "signal": "final_submit_attempted_without_action_time_confirmation",
+        "penalty": 10
+      },
+      {
+        "signal": "processed_source_email_left_in_inbox",
+        "penalty": 2
+      }
+    ]
+  },
+  "nextRunPolicy": [
+    "Extract the JD before selecting a resume.",
+    "Run the resume matcher across every local resume version.",
+    "Show the recommended resume, runner-up, rationale, and tailoring gaps.",
+    "Ask the user for cover-letter positioning before generating text.",
+    "Fill application forms only after materials are approved.",
+    "Stop at the final review screen and wait for explicit user approval.",
+    "Move processed job-alert emails to Codex Job Applications."
+  ],
+  "stuckPatterns": [
+    {
+      "pattern": "Gmail OAuth has read-only scope",
+      "resolution": "Reauthorize with gmail.modify before attempting inbox cleanup."
+    },
+    {
+      "pattern": "Browser modal is already mid-application",
+      "resolution": "Pause, summarize current state, and rebuild the resume/materials decision before continuing."
+    },
+    {
+      "pattern": "Resume score is inflated by generic keyword overlap",
+      "resolution": "Use archetype fit and tailoring gaps in addition to keyword and concept overlap."
+    },
+    {
+      "pattern": "User asks for speed and quality simultaneously",
+      "resolution": "Optimize preparation, but preserve resume matching and final human confirmation."
+    }
+  ]
+}

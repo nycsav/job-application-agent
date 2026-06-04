@@ -39,5 +39,13 @@ flowchart TD
 - `npm run codex:pipeline -- --fixture reports/parallel-scan-fixture.json`
 - `npm run codex:pipeline` after adding `input/saved-jobs.json` or `input/saved-jobs.csv`
 - `npm run codex:test`
+- `npm run codex:resume-match -- --job-json input/<job>.json`
 
 The first implementation pass is stage-only. It scores roles, generates local material manifests, routes submissions, and writes the local ledger. Browser crawling and final submission hooks plug into this spine next.
+
+## Learning Loop
+
+- Run reflection: `docs/CODEX-RUN-LEARNINGS-2026-06-04.md`
+- Machine-readable policy: `config/codex-learning-policy.json`
+
+The current feedback policy rewards the sequence: extract JD, compare actual resume text, explain the resume choice, ask for cover-letter positioning, fill only after approval, stop at final review, and archive processed source emails.
