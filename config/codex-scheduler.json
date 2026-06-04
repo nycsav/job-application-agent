@@ -1,0 +1,16 @@
+{
+  "name": "Codex Job Agent - Stage Applications",
+  "timezone": "America/New_York",
+  "schedule": {
+    "weekdays": ["MO", "TU", "WE", "TH", "FR"],
+    "times": ["09:00", "16:00"]
+  },
+  "command": "npm run codex:pipeline",
+  "mode": "stage-only",
+  "humanGate": true,
+  "notes": [
+    "The scheduled run should crawl, score, generate materials, and stage applications.",
+    "Final submission remains approval-gated.",
+    "Browser crawler implementation is the next build step."
+  ]
+}

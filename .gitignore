@@ -38,6 +38,7 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+data/
 
 # === HARDENED 2026-06-02: keep personal data out of the PUBLIC repo ===
 .secrets/

@@ -4,6 +4,8 @@
   "description": "Automated job application engine — Scanner → Materials → Submitter",
   "type": "module",
   "scripts": {
+    "codex:pipeline": "node agents/codex-orchestrator.mjs",
+    "codex:test": "node --test tests/codex-core.test.mjs",
     "scan": "node agents/scanner.mjs",
     "generate": "node agents/materials.mjs",
     "submit": "node agents/submitter.mjs",

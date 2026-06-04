@@ -1,0 +1,63 @@
+{
+  "version": "2026-06-04",
+  "mode": "local-first-human-gated",
+  "storage": {
+    "applicationsPath": "data/applications.json",
+    "runsDir": "data/runs",
+    "materialsDir": "output/materials",
+    "screenshotsDir": "output/screenshots"
+  },
+  "schedule": {
+    "timezone": "America/New_York",
+    "runs": ["09:00", "16:00"],
+    "weekdaysOnly": true,
+    "stageOnly": true
+  },
+  "hardFilters": {
+    "excludedCompanies": [
+      "Perplexity",
+      "BOI",
+      "Board of Innovation",
+      "Sia Partners",
+      "Sia Experience"
+    ],
+    "fteSalaryFloor": 180000,
+    "contractHourlyFloor": 85,
+    "acceptedLocations": [
+      "new york",
+      "nyc",
+      "remote",
+      "hybrid",
+      "united states"
+    ],
+    "skipIfRequiresDegree": [
+      "computer science",
+      "cs degree",
+      "engineering degree"
+    ],
+    "skipHandsOnICEngineer": true
+  },
+  "thresholds": {
+    "track": 5,
+    "priority": 7,
+    "materials": 8,
+    "dream": 9
+  },
+  "submission": {
+    "defaultAction": "stage_for_approval",
+    "requireHumanApproval": true,
+    "dailyApply4MeBudget": 12,
+    "monthlyApply4MeBudget": 50,
+    "directAtsPlatforms": ["greenhouse", "lever", "ashby"],
+    "manualAssistPlatforms": ["workday", "oracle", "icims", "unknown"],
+    "apply4MeSources": [
+      "ladders",
+      "linkedin",
+      "indeed",
+      "ziprecruiter",
+      "glassdoor",
+      "monster",
+      "careerbuilder"
+    ]
+  }
+}
