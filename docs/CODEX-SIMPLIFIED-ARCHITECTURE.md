@@ -37,6 +37,7 @@ flowchart TD
 ## New Entry Points
 
 - `npm run codex:pipeline -- --fixture reports/parallel-scan-fixture.json`
+- `npm run codex:pipeline` after adding `input/saved-jobs.json` or `input/saved-jobs.csv`
 - `npm run codex:test`
 
 The first implementation pass is stage-only. It scores roles, generates local material manifests, routes submissions, and writes the local ledger. Browser crawling and final submission hooks plug into this spine next.

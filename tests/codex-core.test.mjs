@@ -4,6 +4,11 @@ import { normalizeRole } from '../lib/codex-role.mjs';
 import { evaluateHardFilters, parseSalaryCeiling } from '../lib/codex-filters.mjs';
 import { scoreRole } from '../lib/codex-scorer.mjs';
 import { routeSubmission } from '../lib/codex-submission-router.mjs';
+import { crawlSavedJobs } from '../sources/browser-saved-jobs.mjs';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdtemp } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import policy from '../config/codex-policy.json' with { type: 'json' };
 
 test('normalizes source roles into canonical shape', () => {
@@ -43,4 +48,15 @@ test('routes high score roles through approval-gated paths', () => {
   const route = routeSubmission(role, 9, policy);
   assert.equal(route.requiresHumanApproval, true);
   assert.equal(route.route, 'bespoke_direct_ats');
+});
+
+test('loads saved jobs from local json input', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'codex-jobs-'));
+  await mkdir(path.join(root, 'input'));
+  await writeFile(path.join(root, 'input', 'saved-jobs.json'), JSON.stringify([
+    { company: 'Acme', title: 'Director AI', location: 'Remote' }
+  ]));
+  const result = await crawlSavedJobs({ root, policy });
+  assert.equal(result.roles.length, 1);
+  assert.equal(result.roles[0].company, 'Acme');
 });

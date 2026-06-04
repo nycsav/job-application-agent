@@ -15,7 +15,7 @@ export async function runCodexPipeline({ fixture, roles = [], root = ROOT, stage
   const policy = JSON.parse(await readFile(path.join(root, 'config', 'codex-policy.json'), 'utf8'));
   const store = await loadStore(policy, { root });
   const startedAt = new Date().toISOString();
-  const crawl = !fixture && roles.length === 0 ? await crawlSavedJobs({ root }) : null;
+  const crawl = !fixture && roles.length === 0 ? await crawlSavedJobs({ root, policy }) : null;
   const rawRoles = fixture ? JSON.parse(await readFile(path.resolve(root, fixture), 'utf8')) : (roles.length ? roles : crawl.roles);
   const summary = {
     startedAt,
