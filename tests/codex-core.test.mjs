@@ -6,6 +6,7 @@ import { scoreRole } from '../lib/codex-scorer.mjs';
 import { routeSubmission } from '../lib/codex-submission-router.mjs';
 import { crawlSavedJobs } from '../sources/browser-saved-jobs.mjs';
 import { buildJobSearchQueries } from '../lib/gmail-accounts.mjs';
+import { compareResumeTexts } from '../lib/resume-job-matcher.mjs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { mkdtemp } from 'node:fs/promises';
 import os from 'node:os';
@@ -66,4 +67,17 @@ test('builds multi-account Gmail job queries with a time window', () => {
   const queries = buildJobSearchQueries({ hours: 12 });
   assert.equal(queries.every((query) => query.includes('newer_than:12h')), true);
   assert.equal(queries.some((query) => query.includes('linkedin.com')), true);
+});
+
+test('matches resume text against job dimensions', () => {
+  const job = {
+    title: 'Agentic Solution Principal',
+    description: 'Lead agentic workflows, MCP tools, client stakeholders, technical direction, and production deployment.'
+  };
+  const matches = compareResumeTexts(job, [
+    { id: 'a', label: 'Agentic', file: 'a.docx', text: 'MCP agentic workflows client stakeholders production deployment technical direction' },
+    { id: 'b', label: 'Marketing', file: 'b.docx', text: 'product positioning go-to-market launch messaging' }
+  ]);
+  assert.equal(matches[0].id, 'a');
+  assert.equal(matches[0].score > matches[1].score, true);
 });
