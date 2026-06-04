@@ -145,6 +145,7 @@ Each role is scored 0-10 across 5 dimensions:
 - **No fabrication** — only uses verified metrics from your candidate profile
 - **Screenshot audit trail** — captures form state before submission
 - **Deduplication** — checks Google Sheet before applying to prevent duplicates
+- **Inbox cleanup** — processed job emails are labeled `Codex Job Applications` and removed from the Inbox
 
 ## Claude Code Integration Patterns
 
@@ -154,7 +155,7 @@ This project is built on [Claude Code](https://docs.anthropic.com/en/docs/claude
 
 The pipeline uses multiple MCP servers simultaneously — each one gives Claude direct API access to a service without browser automation:
 
-- **Gmail MCP** — scans LinkedIn/Indeed alert emails, extracts job details, applies processed labels
+- **Gmail API** — scans LinkedIn/Indeed/Ladders alert emails across configured accounts, extracts job details, applies the `Codex Job Applications` label, and archives processed messages from the Inbox
 - **Google Sheets MCP** — reads/writes the job tracker (scores, statuses, Drive links)
 - **Google Drive MCP** — uploads tailored resumes and cover letters directly
 - **Indeed MCP** — searches jobs and pulls full JD details via API

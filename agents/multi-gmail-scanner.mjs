@@ -2,14 +2,22 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { buildJobSearchQueries, getGmailClientForAccount, loadGmailAccounts } from '../lib/gmail-accounts.mjs';
+import { DEFAULT_JOB_APPLICATION_LABEL, moveMessageToGmailLabel } from '../lib/gmail-labels.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 
-export async function scanAllGmailAccounts({ root = ROOT, hours = 24, maxResults = 25 } = {}) {
+export async function scanAllGmailAccounts({
+  root = ROOT,
+  hours = 24,
+  maxResults = 25,
+  archiveProcessed = false,
+  processedLabel = DEFAULT_JOB_APPLICATION_LABEL
+} = {}) {
   const accounts = await loadGmailAccounts({ root });
-  const queries = buildJobSearchQueries({ hours });
+  const queries = buildJobSearchQueries({ hours, processedLabel });
   const findings = [];
   const errors = [];
+  const archivedMessages = [];
 
   for (const account of accounts) {
     let gmail;
@@ -33,7 +41,30 @@ export async function scanAllGmailAccounts({ root = ROOT, hours = 24, maxResults
           const from = header(headers, 'From');
           const date = header(headers, 'Date');
           const body = extractBody(full.data.payload || {});
-          findings.push(...extractRoles({ subject, from, date, body, account }));
+          const roles = extractRoles({ subject, from, date, body, account, message: msg });
+          findings.push(...roles);
+
+          if (archiveProcessed && roles.length) {
+            try {
+              await moveMessageToGmailLabel(gmail, msg.id, processedLabel);
+              archivedMessages.push({
+                account: account.id,
+                email: account.email,
+                messageId: msg.id,
+                threadId: msg.threadId,
+                label: processedLabel,
+                roles: roles.map((role) => ({ company: role.company, title: role.title }))
+              });
+            } catch (err) {
+              errors.push({
+                account: account.id,
+                email: account.email,
+                messageId: msg.id,
+                action: 'archiveProcessed',
+                error: err.message
+              });
+            }
+          }
         }
       } catch (err) {
         errors.push({ account: account.id, email: account.email, query, error: err.message });
@@ -41,18 +72,23 @@ export async function scanAllGmailAccounts({ root = ROOT, hours = 24, maxResults
     }
   }
 
-  return { findings, errors };
+  return { findings, errors, archivedMessages };
 }
 
 export async function writeFindingsToInput(result, { root = ROOT } = {}) {
   const inputDir = path.join(root, 'input');
   await mkdir(inputDir, { recursive: true });
   const out = path.join(inputDir, 'saved-jobs.json');
-  await writeFile(out, JSON.stringify({ roles: result.findings, errors: result.errors, generatedAt: new Date().toISOString() }, null, 2));
+  await writeFile(out, JSON.stringify({
+    roles: result.findings,
+    errors: result.errors,
+    archivedMessages: result.archivedMessages || [],
+    generatedAt: new Date().toISOString()
+  }, null, 2));
   return out;
 }
 
-function extractRoles({ subject, from, date, body, account }) {
+function extractRoles({ subject, from, date, body, account, message }) {
   const roles = [];
   const text = `${subject}\n${body}`;
   const linkedIn = /([A-Z][^\n|•]{4,80})\s+at\s+([A-Z][A-Za-z0-9&.,' -]{2,60})/g;
@@ -87,7 +123,9 @@ function baseRole({ title, company, subject, from, date, body, account }) {
     sourceEmail: account.email,
     sourceSender: from,
     sourceSubject: subject,
-    sourceDate: date
+    sourceDate: date,
+    gmailMessageId: message?.id || '',
+    gmailThreadId: message?.threadId || ''
   };
 }
 
@@ -147,20 +185,30 @@ function clean(value = '') {
 }
 
 function parseArgs(argv) {
-  const out = { hours: 24 };
+  const out = { hours: 24, archiveProcessed: false, processedLabel: DEFAULT_JOB_APPLICATION_LABEL };
   for (let i = 0; i < argv.length; i += 1) {
     if (argv[i] === '--hours') out.hours = Number(argv[++i]);
     if (argv[i] === '--write-input') out.writeInput = true;
+    if (argv[i] === '--archive-processed') out.archiveProcessed = true;
+    if (argv[i] === '--no-archive-processed') out.archiveProcessed = false;
+    if (argv[i] === '--processed-label') out.processedLabel = argv[++i];
   }
   return out;
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const args = parseArgs(process.argv.slice(2));
-  const result = await scanAllGmailAccounts({ hours: args.hours });
+  const result = await scanAllGmailAccounts({
+    hours: args.hours,
+    archiveProcessed: args.archiveProcessed,
+    processedLabel: args.processedLabel
+  });
   if (args.writeInput) {
     const out = await writeFindingsToInput(result);
     console.error(`Wrote ${result.findings.length} findings to ${out}`);
+  }
+  if (args.archiveProcessed) {
+    console.error(`Moved ${result.archivedMessages.length} processed Gmail messages to "${args.processedLabel}"`);
   }
   console.log(JSON.stringify(result, null, 2));
 }

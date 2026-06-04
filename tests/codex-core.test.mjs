@@ -6,6 +6,7 @@ import { scoreRole } from '../lib/codex-scorer.mjs';
 import { routeSubmission } from '../lib/codex-submission-router.mjs';
 import { crawlSavedJobs } from '../sources/browser-saved-jobs.mjs';
 import { buildJobSearchQueries } from '../lib/gmail-accounts.mjs';
+import { ensureGmailLabel, gmailLabelSearchTerm, moveMessageToGmailLabel } from '../lib/gmail-labels.mjs';
 import { compareResumeTexts } from '../lib/resume-job-matcher.mjs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { mkdtemp } from 'node:fs/promises';
@@ -67,6 +68,40 @@ test('builds multi-account Gmail job queries with a time window', () => {
   const queries = buildJobSearchQueries({ hours: 12 });
   assert.equal(queries.every((query) => query.includes('newer_than:12h')), true);
   assert.equal(queries.some((query) => query.includes('linkedin.com')), true);
+  assert.equal(queries.every((query) => query.includes('-label:"Codex Job Applications"')), true);
+});
+
+test('formats Gmail label exclusion terms for search', () => {
+  assert.equal(gmailLabelSearchTerm('Codex Job Applications'), '-label:"Codex Job Applications"');
+});
+
+test('creates and applies Gmail processed label while archiving from inbox', async () => {
+  const calls = [];
+  const gmail = {
+    users: {
+      labels: {
+        list: async () => ({ data: { labels: [] } }),
+        create: async (request) => {
+          calls.push(['labels.create', request]);
+          return { data: { id: 'Label_123' } };
+        }
+      },
+      messages: {
+        modify: async (request) => {
+          calls.push(['messages.modify', request]);
+          return { data: {} };
+        }
+      }
+    }
+  };
+
+  assert.equal(await ensureGmailLabel(gmail, 'Codex Job Applications'), 'Label_123');
+  await moveMessageToGmailLabel(gmail, 'msg-1', 'Codex Job Applications');
+  assert.equal(calls[0][0], 'labels.create');
+  assert.deepEqual(calls[2][1].requestBody, {
+    addLabelIds: ['Label_123'],
+    removeLabelIds: ['INBOX']
+  });
 });
 
 test('matches resume text against job dimensions', () => {
