@@ -8,6 +8,8 @@
     "codex:test": "node --test tests/codex-core.test.mjs",
     "codex:gmail": "node agents/multi-gmail-scanner.mjs --write-input --archive-processed",
     "codex:resume-match": "node agents/resume-match.mjs",
+    "codex:build-ats-resumes": "python3 scripts/build-ats-resumes.py",
+    "codex:audit-ats-resumes": "python3 scripts/audit-ats-resumes.py",
     "scan": "node agents/scanner.mjs",
     "generate": "node agents/materials.mjs",
     "submit": "node agents/submitter.mjs",

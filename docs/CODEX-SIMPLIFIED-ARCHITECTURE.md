@@ -64,3 +64,11 @@ Approved target archetypes live in `config/codex-role-archetypes.json` and are u
 | AI Product Strategy / GTM / Partnerships | Medium-High | PMM / GTM |
 
 The role scorer now returns the best archetype, strategic-fit band, top archetype matches, and the normal 0-10 score. Resume routing uses the winning archetype before falling back to generic keyword rules.
+
+## ATS Resume Set
+
+- Resume optimization note: `docs/ATS-RESUME-OPTIMIZATION.md`
+- Build command: `npm run codex:build-ats-resumes`
+- Audit command: `npm run codex:audit-ats-resumes`
+
+The active resume map points to ATS-optimized private DOCX files in `materials/resumes/optimized/`. These files are generated locally and intentionally excluded from git.

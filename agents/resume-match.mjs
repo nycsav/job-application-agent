@@ -10,25 +10,25 @@ const RESUMES = [
   {
     id: 'md_managed_services',
     label: 'MD / Managed Services',
-    file: 'materials/resumes/Sav_Banerjee_Resume_2026_MD_ManagedServices.docx',
+    file: 'materials/resumes/optimized/Sav_Banerjee_Resume_MD_ManagedServices_ATS_2026.docx',
     profileTerms: ['managed services', 'practice', 'operating model', 'transformation', 'delivery', 'executive', 'c-suite']
   },
   {
     id: 'forward_deployed',
     label: 'Forward Deployed AI Architect',
-    file: 'materials/resumes/Sav_Banerjee_Resume_ForwardDeployed_2026.docx',
+    file: 'materials/resumes/optimized/Sav_Banerjee_Resume_ForwardDeployed_ATS_2026.docx',
     profileTerms: ['forward deployed', 'agentic', 'solution principal', 'architect', 'platform', 'engineering', 'hands-on', 'mcp']
   },
   {
     id: 'ai_advisory',
     label: 'AI Advisory / Transformation',
-    file: 'materials/resumes/Sav_Banerjee_Resume_2026_v3.docx',
+    file: 'materials/resumes/optimized/Sav_Banerjee_Resume_AI_Transformation_ATS_2026.docx',
     profileTerms: ['advisory', 'transformation', 'strategy', 'operating model', 'stakeholder', 'roadmap', 'change management']
   },
   {
     id: 'product_marketing',
     label: 'Product Marketing / GTM',
-    file: 'materials/resumes/Sav_Banerjee_Resume_2026_PMM_v2.docx',
+    file: 'materials/resumes/optimized/Sav_Banerjee_Resume_PMM_GTM_ATS_2026.docx',
     profileTerms: ['product marketing', 'gtm', 'go-to-market', 'positioning', 'messaging', 'launch', 'sales enablement']
   }
 ];
