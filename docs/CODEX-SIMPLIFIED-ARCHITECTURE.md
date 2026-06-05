@@ -83,6 +83,19 @@ This produces:
 
 This is the practical reinforcement-learning loop: the agent rewards roles where background, market, and JD align; it penalizes roles that are only superficially senior or only weakly connected to the strategic pivot.
 
+## Enso Labs Market Strategy
+
+- Strategy config: `config/enso-market-strategy.json`
+- Opportunity classifier: `lib/enso-market-strategy.mjs`
+- Pipeline note: `docs/ENSO-MARKET-PIPELINE.md`
+
+The search strategy is now a barbell:
+
+- 70% Enso Labs client/project acquisition.
+- 30% selective W2 platform-side applications.
+
+W2 opportunities are filtered against a `$180K` base salary floor and scored for forward-deployed AI deployment fit. Contract/client opportunities use Enso Labs pricing floors: `$175/hr` minimum, `$12K-$25K` diagnostics, `$45K-$120K` pilot-to-production builds, and `$8K-$25K/month` managed-services retainers.
+
 ## ATS Resume Set
 
 - Resume optimization note: `docs/ATS-RESUME-OPTIMIZATION.md`

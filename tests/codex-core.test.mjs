@@ -6,6 +6,7 @@ import { scoreRole } from '../lib/codex-scorer.mjs';
 import { classifyRoleArchetypes } from '../lib/codex-archetypes.mjs';
 import { evaluateRoleAlignment } from '../lib/codex-alignment.mjs';
 import { chooseResumeCluster } from '../lib/codex-resume-router.mjs';
+import { buildMarketSearchQueries, classifyMarketOpportunity } from '../lib/enso-market-strategy.mjs';
 import { routeSubmission } from '../lib/codex-submission-router.mjs';
 import { crawlSavedJobs } from '../sources/browser-saved-jobs.mjs';
 import { buildJobSearchQueries } from '../lib/gmail-accounts.mjs';
@@ -112,6 +113,39 @@ test('penalizes senior roles that do not align to AI transformation market or re
   assert.equal(alignment.score < 5, true);
   assert.equal(alignment.flags.includes('legacy_advertising_without_ai_pivot'), true);
   assert.equal(scoreRole(role).score < policy.thresholds.materials, true);
+});
+
+test('classifies Enso Labs consulting prospects with contract economics', () => {
+  const opportunity = {
+    company: 'PressW',
+    title: 'Claude Managed Services Implementation Partner',
+    description: 'Deploy, manage, and optimize Claude across enterprise organizations with custom agent development, MCP integration, managed services, governance, observability, and AI transformation support for media and marketing teams.'
+  };
+  const result = classifyMarketOpportunity(opportunity);
+  assert.equal(result.type, 'contract');
+  assert.equal(result.searchTrack, 'contract_project');
+  assert.equal(result.economics.hourlyFloor, 175);
+  assert.equal(['send_paid_diagnostic_pitch', 'track_and_research'].includes(result.recommendedAction), true);
+});
+
+test('flags low-comp W2 opportunities below Enso strategy floor', () => {
+  const opportunity = {
+    company: 'LowComp AI',
+    title: 'Forward Deployed AI Strategist',
+    salary: '$120K - $150K',
+    description: 'Client-facing production AI deployment, agentic workflows, MCP, enterprise customers, and pilot-to-production outcomes.'
+  };
+  const result = classifyMarketOpportunity(opportunity);
+  assert.equal(result.type, 'w2');
+  assert.equal(result.economics.pass, false);
+  assert.equal(result.recommendedAction, 'skip_or_negotiate_comp');
+});
+
+test('builds market search queries for both W2 and Enso prospecting', () => {
+  const queries = buildMarketSearchQueries();
+  assert.equal(queries.w2.some((query) => query.includes('Forward Deployed')), true);
+  assert.equal(queries.contract.some((query) => query.includes('Claude managed services')), true);
+  assert.equal(queries.clientProspecting.some((query) => query.includes('media AI transformation')), true);
 });
 
 test('routes high score roles through approval-gated paths', () => {

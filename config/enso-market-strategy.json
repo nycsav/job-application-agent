@@ -1,0 +1,128 @@
+{
+  "version": "2026-06-05",
+  "positioning": "Enso Labs is a forward-deployed AI deployment studio for media, healthcare, finance, and enterprise teams moving from AI experiments to managed production systems.",
+  "strategy": {
+    "primary": "Enso Labs client and project acquisition",
+    "secondary": "Selective W2 platform-side applications",
+    "allocation": {
+      "clientProjects": 70,
+      "w2Roles": 30
+    }
+  },
+  "w2Targets": {
+    "baseSalaryFloor": 180000,
+    "preferredBaseSalary": 220000,
+    "premiumBaseSalary": 280000,
+    "equityPreferred": true,
+    "targetTitles": [
+      "Forward Deployed AI Strategist",
+      "AI Deployment Strategist",
+      "Forward Deployed AI Engineer",
+      "Forward Deployed Product Manager",
+      "AI Solutions Principal",
+      "Agentic Workflows Product Owner",
+      "Director AI Transformation",
+      "Head of AI Strategy and Deployment"
+    ],
+    "mustHaveSignals": [
+      "client-facing deployment",
+      "production AI",
+      "agentic workflows",
+      "enterprise customers",
+      "pilot-to-production",
+      "value realization"
+    ],
+    "avoidSignals": [
+      "pure backend engineering",
+      "junior implementation",
+      "legacy brand strategy without AI",
+      "sub-180k base",
+      "degree hard gate without equivalent experience"
+    ]
+  },
+  "contractTargets": {
+    "hourlyFloor": 175,
+    "preferredHourly": 250,
+    "premiumHourly": 300,
+    "diagnosticRange": {
+      "min": 12000,
+      "max": 25000,
+      "duration": "2 weeks"
+    },
+    "pilotToProductionRange": {
+      "min": 45000,
+      "max": 120000,
+      "duration": "6-12 weeks"
+    },
+    "managedServicesRetainerRange": {
+      "min": 8000,
+      "max": 25000,
+      "duration": "monthly"
+    },
+    "fractionalLeadRange": {
+      "min": 12000,
+      "max": 30000,
+      "duration": "monthly"
+    },
+    "preferredEngagements": [
+      "Claude managed services",
+      "AI Center of Excellence buildout",
+      "agentic workflow deployment",
+      "media and marketing AI transformation",
+      "AI-native operating model design",
+      "executive AI adoption program",
+      "RAG evaluation and governance",
+      "MCP integration strategy"
+    ]
+  },
+  "targetSegments": [
+    {
+      "segment": "AI-native platforms",
+      "pitch": "Forward-deployed deployment strategy and customer implementation for AI products moving from pilots to scaled enterprise adoption."
+    },
+    {
+      "segment": "Media and marketing organizations",
+      "pitch": "Agentic workflows, Claude managed services, AI search optimization, content intelligence, and marketing operating-model transformation."
+    },
+    {
+      "segment": "Healthcare and pharma agencies",
+      "pitch": "MLR-aware AI CoE design, compliant RAG knowledge systems, workflow automation, and managed AI operations."
+    },
+    {
+      "segment": "Financial services and fintech",
+      "pitch": "Autonomous research, market intelligence, MCP-connected tools, human-in-the-loop governance, and trading/portfolio decision support."
+    },
+    {
+      "segment": "Enterprise consulting and boutique partners",
+      "pitch": "Senior subcontractor or partner capacity for strategy-to-ship agentic AI implementation work."
+    }
+  ],
+  "searchQueries": {
+    "w2": [
+      "Forward Deployed AI Strategist",
+      "AI Deployment Strategist",
+      "Forward Deployed Product Manager AI agent platform",
+      "Senior Product Owner Agentic Workflows",
+      "AI Solutions Principal MCP",
+      "Head of AI Strategy Deployment",
+      "Director AI Transformation agentic"
+    ],
+    "contract": [
+      "agentic AI consultant contract",
+      "Claude managed services consultant",
+      "AI transformation consultant contract media",
+      "AI Center of Excellence consultant contract",
+      "MCP integration consultant enterprise",
+      "RAG evaluation consultant contract",
+      "AI managed services partner"
+    ],
+    "clientProspecting": [
+      "AI-native marketing agency agentic AI",
+      "Claude implementation partner managed services",
+      "media AI transformation consulting",
+      "pharma AI Center of Excellence agency",
+      "financial AI agent consulting",
+      "enterprise agentic AI managed services"
+    ]
+  }
+}
