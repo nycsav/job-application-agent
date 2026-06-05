@@ -4,6 +4,7 @@ import { normalizeRole } from '../lib/codex-role.mjs';
 import { evaluateHardFilters, parseSalaryCeiling } from '../lib/codex-filters.mjs';
 import { scoreRole } from '../lib/codex-scorer.mjs';
 import { classifyRoleArchetypes } from '../lib/codex-archetypes.mjs';
+import { evaluateRoleAlignment } from '../lib/codex-alignment.mjs';
 import { chooseResumeCluster } from '../lib/codex-resume-router.mjs';
 import { routeSubmission } from '../lib/codex-submission-router.mjs';
 import { crawlSavedJobs } from '../sources/browser-saved-jobs.mjs';
@@ -81,6 +82,36 @@ test('scores and routes approved archetypes to matching resume clusters', async 
   assert.equal(scoreRole(managedServices).archetype.id, 'ai_coe_managed_services');
   assert.equal((await chooseResumeCluster(vpTransformation)).cluster, 'ai_advisory');
   assert.equal((await chooseResumeCluster(managedServices)).cluster, 'ai_consulting');
+});
+
+test('aligns role scoring across candidate corpus market category and JD', () => {
+  const role = normalizeRole({
+    company: 'Smartsheet',
+    title: 'Senior Forward Deployed AI Strategist',
+    location: 'Remote',
+    salary: '$230K',
+    description: 'Own technical discovery through production deployment, design multi-agent solutions, MCP deployment kits, enterprise systems, cloud infrastructure, agentic workflow transformation, evaluation, observability, C-suite stakeholder alignment, and pilot-to-production outcomes.'
+  });
+  const alignment = evaluateRoleAlignment(role);
+  assert.equal(alignment.archetype.id, 'forward_deployed_ai_strategist');
+  assert.equal(alignment.score >= 8, true);
+  assert.equal(alignment.candidateCorpusFit >= 7, true);
+  assert.equal(alignment.marketCategoryFit >= 7, true);
+  assert.equal(alignment.flags.includes('weak_candidate_evidence_overlap'), false);
+});
+
+test('penalizes senior roles that do not align to AI transformation market or resume evidence', () => {
+  const role = normalizeRole({
+    company: 'Legacy Agency',
+    title: 'VP Brand Strategy',
+    location: 'New York',
+    salary: '$240K',
+    description: 'Lead brand strategy, campaign planning, advertising strategy, creative briefs, media planning, and agency account growth.'
+  });
+  const alignment = evaluateRoleAlignment(role);
+  assert.equal(alignment.score < 5, true);
+  assert.equal(alignment.flags.includes('legacy_advertising_without_ai_pivot'), true);
+  assert.equal(scoreRole(role).score < policy.thresholds.materials, true);
 });
 
 test('routes high score roles through approval-gated paths', () => {

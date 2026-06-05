@@ -1,0 +1,175 @@
+{
+  "version": "2026-06-05",
+  "description": "Three-way alignment model: candidate evidence corpus, current market language, and individual JD signals must agree before a role is treated as high priority.",
+  "candidateEvidenceSignals": [
+    "strategy-to-ship",
+    "production systems",
+    "production ai",
+    "agentic",
+    "mcp",
+    "claude",
+    "gemini",
+    "managed agents api",
+    "google i/o 2026",
+    "frontier",
+    "langgraph",
+    "rag",
+    "evaluation",
+    "observability",
+    "pilot-to-production",
+    "pilot to production",
+    "time-to-first-value",
+    "operating model",
+    "ai center of excellence",
+    "managed services",
+    "c-suite",
+    "executive stakeholders",
+    "value realization",
+    "governance",
+    "healthcare",
+    "pharma",
+    "financial services",
+    "manufacturing",
+    "gtm",
+    "go-to-market",
+    "partnerships",
+    "positioning",
+    "buyer enablement"
+  ],
+  "marketSignalsByArchetype": {
+    "forward_deployed_ai_strategist": [
+      "forward deployed",
+      "full deployment lifecycle",
+      "technical discovery",
+      "production deployment",
+      "solutions org handoff",
+      "multi-agent solutions",
+      "mcp",
+      "deployment kits",
+      "workflow transformation",
+      "enterprise systems",
+      "cloud infrastructure",
+      "ai services"
+    ],
+    "vp_director_ai_transformation": [
+      "strategy into scaled ai outcomes",
+      "concept to production deployment",
+      "business adoption",
+      "model performance",
+      "production readiness",
+      "technical debt",
+      "enterprise ai strategy",
+      "ai strategy and transformation",
+      "ai strategy & transformation",
+      "production deployment",
+      "business adoption",
+      "operational performance",
+      "model lifecycle",
+      "mlops",
+      "evaluation",
+      "human-in-the-loop controls",
+      "safe compliant deployment"
+    ],
+    "lead_ai_consultant": [
+      "ai advisory",
+      "implementation partner",
+      "strategy through long-term operations",
+      "certified implementation",
+      "enterprise deployment",
+      "workshops",
+      "readiness",
+      "roadmap",
+      "business case",
+      "governance",
+      "value realization"
+    ],
+    "agentic_ai_platform_architect": [
+      "agentic platform",
+      "agent orchestration",
+      "production-grade llm agents",
+      "typed tool interfaces",
+      "multi-agent topologies",
+      "governance",
+      "observability",
+      "reproducibility",
+      "safe autonomy",
+      "mcp",
+      "evaluation",
+      "cloud-native"
+    ],
+    "ai_coe_managed_services": [
+      "operating model",
+      "coverage model",
+      "time-to-first-value",
+      "time-to-scaled-value",
+      "agentic deployment",
+      "adoption engagement",
+      "business outcomes",
+      "change adoption",
+      "best practices",
+      "scale effective adoption models",
+      "managed services"
+    ],
+    "ai_product_gtm_partnerships": [
+      "gtm strategy",
+      "ai products",
+      "models apis tooling",
+      "market feedback",
+      "partnerships",
+      "ecosystem development",
+      "enterprise gtm",
+      "product-market fit",
+      "customer segments",
+      "co-sell",
+      "partner gtm governance",
+      "executive narratives"
+    ]
+  },
+  "marketSources": [
+    {
+      "archetype": "forward_deployed_ai_strategist",
+      "url": "https://agentic-engineering-jobs.com/jobs/natera-director-forward-deployed-ai-engineering-Btljx8",
+      "signal": "Director Forward Deployed AI Engineering roles emphasize full deployment lifecycle and workflow transformation."
+    },
+    {
+      "archetype": "forward_deployed_ai_strategist",
+      "url": "https://agentic-engineering-jobs.com/jobs/smartsheet-senior-forward-deployed-ai-engineer-RHDUGs",
+      "signal": "Forward deployed AI roles emphasize technical discovery, production deployment, MCP resource packs, and deployment kits."
+    },
+    {
+      "archetype": "vp_director_ai_transformation",
+      "url": "https://careers.astrazeneca.com/job/gaithersburg/director-enterprise-ai-process-and-innovation/7684/95327878576",
+      "signal": "Enterprise AI directors translate strategy into scaled AI outcomes and own production deployment/business adoption."
+    },
+    {
+      "archetype": "vp_director_ai_transformation",
+      "url": "https://swooped.co/job-postings/director-ai-strategy-transformation-remote-humana-75914",
+      "signal": "AI transformation directors align enterprise strategy with model lifecycle, evaluation, human-in-the-loop controls, and safe deployment."
+    },
+    {
+      "archetype": "ai_coe_managed_services",
+      "url": "https://app.eightfold.ai/careers/job/68760922777-head-of-adoption-value-realization-agentic-santa-clara-ca-usa?domain=eightfold.ai",
+      "signal": "Agentic adoption/value realization roles emphasize operating model, coverage model, and time-to-scaled-value."
+    },
+    {
+      "archetype": "ai_product_gtm_partnerships",
+      "url": "https://aijobs.whatsthebigdata.com/job/head-of-ai-gtm-partnerships",
+      "signal": "AI GTM partnership roles emphasize model/API/tooling GTM, market feedback, and ecosystem development."
+    },
+    {
+      "archetype": "ai_product_gtm_partnerships",
+      "url": "https://jobs.stripes.co/companies/databricks/jobs/77065079-sr-alliance-director-ai-gtm",
+      "signal": "AI alliance roles emphasize co-sell KPIs, partner GTM governance, and cross-functional product/engineering/sales collaboration."
+    },
+    {
+      "archetype": "agentic_ai_platform_architect",
+      "url": "https://arxiv.org/abs/2602.10479",
+      "signal": "Agentic software architecture literature emphasizes typed tool interfaces, multi-agent topologies, governance, observability, and reproducibility."
+    }
+  ],
+  "alignmentBands": {
+    "strong": 8,
+    "good": 6,
+    "weak": 4
+  }
+}

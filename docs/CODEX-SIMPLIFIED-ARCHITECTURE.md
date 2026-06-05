@@ -65,6 +65,24 @@ Approved target archetypes live in `config/codex-role-archetypes.json` and are u
 
 The role scorer now returns the best archetype, strategic-fit band, top archetype matches, and the normal 0-10 score. Resume routing uses the winning archetype before falling back to generic keyword rules.
 
+## Three-Way Alignment Scoring
+
+The scorer also uses `config/codex-alignment-model.json` and `lib/codex-alignment.mjs` to reward roles where three signals agree:
+
+1. **Candidate evidence corpus:** Enso Labs, case studies, LinkedIn, and the optimized resume set prove the capability.
+2. **Current market language:** recent job descriptions in the archetype category ask for the same capabilities.
+3. **Individual JD fit:** the specific role description uses the same language and responsibilities.
+
+This produces:
+
+- `candidateCorpusFit`
+- `marketCategoryFit`
+- `jdArchetypeFit`
+- overall `alignment.score`
+- alignment flags such as `weak_candidate_evidence_overlap`, `weak_current_market_pattern_overlap`, `likely_too_ic_engineering`, and `legacy_advertising_without_ai_pivot`
+
+This is the practical reinforcement-learning loop: the agent rewards roles where background, market, and JD align; it penalizes roles that are only superficially senior or only weakly connected to the strategic pivot.
+
 ## ATS Resume Set
 
 - Resume optimization note: `docs/ATS-RESUME-OPTIMIZATION.md`

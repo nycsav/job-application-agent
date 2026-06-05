@@ -26,6 +26,10 @@
       {
         "signal": "processed_job_email_labeled_and_archived",
         "reward": 2
+      },
+      {
+        "signal": "candidate_market_and_jd_alignment_score_strong",
+        "reward": 5
       }
     ],
     "negative": [
@@ -48,11 +52,16 @@
       {
         "signal": "processed_source_email_left_in_inbox",
         "penalty": 2
+      },
+      {
+        "signal": "role_senior_but_candidate_market_jd_alignment_weak",
+        "penalty": 5
       }
     ]
   },
   "nextRunPolicy": [
     "Extract the JD before selecting a resume.",
+    "Evaluate candidate corpus fit, current market category fit, and JD archetype fit before prioritizing the role.",
     "Run the resume matcher across every local resume version.",
     "Show the recommended resume, runner-up, rationale, and tailoring gaps.",
     "Ask the user for cover-letter positioning before generating text.",
