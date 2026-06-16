@@ -274,9 +274,11 @@ export async function createSubmissionPlan(roleId, sheetRows = []) {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const roleId = process.argv[2];
+  const autonomous = process.argv.includes('--autonomous');
 
   if (!roleId) {
-    console.log('Usage: node submitter.mjs <role-id>');
+    console.log('Usage: node submitter.mjs <role-id> [--autonomous]');
+    console.log('  --autonomous  Remove human-approval gate (all safety guards still enforced)');
     console.log('\nAvailable platforms:');
     Object.entries(PLATFORM_STRATEGIES).forEach(([key, val]) => {
       console.log(`  ${key}: ${val.name} ┄ ${val.description}`);
@@ -284,12 +286,56 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(0);
   }
 
-  createSubmissionPlan(roleId).then(plan => {
-    console.log('\nSubmission Plan:');
+  const planFn = autonomous ? createAutonomousSubmissionPlan : createSubmissionPlan;
+  planFn(roleId).then(plan => {
+    console.log(autonomous ? '\nAutonomous Submission Plan:' : '\nSubmission Plan:');
     console.log(JSON.stringify(plan, null, 2));
   }).catch(err => {
     console.error('Error:', err.message);
   });
 }
 
-export { PLATFORM_STRATEGIES };
+// ─── Autonomous Platform Strategies ────────────────────────────
+// Same as PLATFORM_STRATEGIES but without the human-gate STOP steps.
+// Used when --autonomous flag is passed to createSubmissionPlan().
+
+const AUTONOMOUS_PLATFORM_STRATEGIES = Object.fromEntries(
+  Object.entries(PLATFORM_STRATEGIES).map(([key, strategy]) => [
+    key,
+    {
+      ...strategy,
+      steps: strategy.steps.filter(step => !step.startsWith('STOP —')),
+    }
+  ])
+);
+
+// Add the final submit step to each autonomous strategy
+for (const strategy of Object.values(AUTONOMOUS_PLATFORM_STRATEGIES)) {
+  strategy.steps.push('Click the Submit button — autonomous mode, no human approval required');
+  strategy.steps.push('Wait for confirmation page and capture screenshot');
+}
+
+export { PLATFORM_STRATEGIES, AUTONOMOUS_PLATFORM_STRATEGIES };
+
+// ─── Autonomous Submission Plan ─────────────────────────────────
+
+/**
+ * Like createSubmissionPlan() but removes the human-approval gate.
+ * All safety guards (dedup, score gate, batch limit, exclusions) are preserved.
+ *
+ * @param {string} roleId - Role ID from roles.json
+ * @param {Array} sheetRows - Existing sheet rows for dedup check
+ */
+export async function createAutonomousSubmissionPlan(roleId, sheetRows = []) {
+  const plan = await createSubmissionPlan(roleId, sheetRows);
+  const strategy = AUTONOMOUS_PLATFORM_STRATEGIES[
+    Object.keys(PLATFORM_STRATEGIES).find(k => PLATFORM_STRATEGIES[k].name === plan.platform)
+  ] || AUTONOMOUS_PLATFORM_STRATEGIES.custom;
+
+  return {
+    ...plan,
+    steps: strategy.steps,
+    human_approval_required: false,
+    autonomous: true,
+  };
+}

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.sav.job-auto-submit</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/bin/node</string>
+        <string>/Users/savbanerjee/Documents/Claude/Projects/Job-Application-Agent/daemon/submit-ready.mjs</string>
+        <string>--max</string>
+        <string>7</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/savbanerjee/Documents/Claude/Projects/Job-Application-Agent</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>HEADLESS</key>
+        <string>true</string>
+        <!-- NOTION_API_KEY intentionally NOT set here: submit-ready.mjs falls
+             back to .secrets/notion-token.txt, which keeps the key out of
+             world-readable LaunchAgents plists. -->
+        <key>PATH</key>
+        <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin</string>
+    </dict>
+
+    <!-- Every 2 hours, 9 AM – 9 PM ET (system timezone must be set to America/New_York) -->
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>11</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>13</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>15</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>19</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>21</integer><key>Minute</key><integer>0</integer></dict>
+    </array>
+
+    <key>StandardOutPath</key>
+    <string>/Users/savbanerjee/Documents/Claude/Projects/Job-Application-Agent/.logs/auto-submit-stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/savbanerjee/Documents/Claude/Projects/Job-Application-Agent/.logs/auto-submit-stderr.log</string>
+
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>

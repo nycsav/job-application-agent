@@ -24,7 +24,7 @@
  */
 
 import { chromium } from 'playwright';
-import { existsSync, mkdirSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync } from 'fs';
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -34,10 +34,17 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..');
 const STORAGE_STATE_PATH = join(REPO_ROOT, '.secrets', 'linkedin-state.json');
 const AUDIT_ROOT = join(REPO_ROOT, '.audit');
-// Updated 2026-05-28: v2 archived to _archive_2026-05-28/, v3 is the new default.
-// TODO: daemon should consult candidate.json.resume_routing to pick between v3 / MD_ManagedServices / PMM_v2 / ForwardDeployed per role.
-// Until then, v3 (AI Transformation / Advisory) is the safest default since it submitted ClifyX + Experian successfully on 2026-05-27.
-const RESUME_DEFAULT = join(REPO_ROOT, 'materials', 'resumes', 'Sav_Banerjee_Resume_2026_v3.pdf');
+// Resume default sourced from config/candidate.json (resume.default_path) so it
+// stays in lock-step with the single source of truth (lib/resume-router.mjs) and
+// never drifts. Per-role routing can later call resume-router selectResume().
+const RESUME_DEFAULT = (() => {
+  try {
+    const c = JSON.parse(readFileSync(join(REPO_ROOT, 'config', 'candidate.json'), 'utf-8'));
+    return join(REPO_ROOT, c.resume.default_path);
+  } catch {
+    return join(REPO_ROOT, 'materials', 'resumes', 'Sav_Banerjee_Resume_2026_v3.pdf');
+  }
+})();
 
 const HARD_FILTERS = {
   // 2026-05-28: Added 'sia partners' + 'sia experience' — Sav is in direct recruiter conversation, do not auto-apply.
@@ -296,11 +303,12 @@ async function walkForm(page, modalLocator, jobId, answers) {
 
 // ─── Main applyTo ───────────────────────────────────────────────
 
-export async function applyTo(jobId, { skipFilters = false, dryRun = false } = {}) {
+export async function applyTo(jobId, { skipFilters = false, dryRun = false, url: urlOverride = null } = {}) {
   const auditDir = ensureAuditDir();
   const browser = await makeContext();
   const page = await browser.newPage();
-  const url = `https://www.linkedin.com/jobs/view/${jobId}/`;
+  const url = urlOverride || `https://www.linkedin.com/jobs/view/${jobId}/`;
+  const auditId = jobId || `url-${String(url).replace(/[^a-z0-9]+/gi, '-').slice(-40)}`;
 
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded' });
@@ -340,7 +348,7 @@ export async function applyTo(jobId, { skipFilters = false, dryRun = false } = {
       }
     }
 
-    const beforeShot = join(auditDir, `${jobId}-before.png`);
+    const beforeShot = join(auditDir, `${auditId}-before.png`);
     await page.screenshot({ path: beforeShot, fullPage: false });
 
     // Dry-run: report what WOULD happen without clicking Easy Apply
@@ -370,7 +378,7 @@ export async function applyTo(jobId, { skipFilters = false, dryRun = false } = {
 
     const modal = page.locator('[role="dialog"]').first();
     if (!(await modal.isVisible({ timeout: 5000 }).catch(() => false))) {
-      const afterShot = join(auditDir, `${jobId}-no-modal.png`);
+      const afterShot = join(auditDir, `${auditId}-no-modal.png`);
       await page.screenshot({ path: afterShot, fullPage: false });
       return { ok: false, status: 'failed', job_id: jobId, ...signals, reason: 'Easy Apply modal did not open', audit: { before: beforeShot, after: afterShot } };
     }
@@ -378,7 +386,7 @@ export async function applyTo(jobId, { skipFilters = false, dryRun = false } = {
     const answers = await loadAnswers();
     const walk = await walkForm(page, modal, jobId, answers);
 
-    const afterShot = join(auditDir, `${jobId}-${walk.status}.png`);
+    const afterShot = join(auditDir, `${auditId}-${walk.status}.png`);
     await page.screenshot({ path: afterShot, fullPage: false });
 
     return {
@@ -396,7 +404,7 @@ export async function applyTo(jobId, { skipFilters = false, dryRun = false } = {
       audit: { before: beforeShot, after: afterShot },
     };
   } catch (err) {
-    const errorShot = join(auditDir, `${jobId}-error.png`);
+    const errorShot = join(auditDir, `${auditId}-error.png`);
     await page.screenshot({ path: errorShot, fullPage: false }).catch(() => {});
     // Re-grab signals so we know WHAT failed (title/company even on error)
     let lastSignals = {};

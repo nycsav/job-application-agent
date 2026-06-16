@@ -26,7 +26,11 @@ const KEYWORD_MAP = [
   [/authorized to work|work authorization|legally (eligible|authorized)/i, 'work_authorized_us'],
   [/citizen(ship)?\b/i, 'citizenship_status'],
   [/relocat/i, 'willing_to_relocate'],
-  [/current(ly)? (located|reside|live)|where (are|do) you (live|located)/i, 'current_location'],
+  [/in.?person|on.?site|one of our offices|return to office|\brto\b|hybrid (work|schedule)/i, 'open_to_in_person_office'],
+  [/business hours|schedule align|core hours|est\/edt|time ?zone|working hours/i, 'comfortable_est_hours'],
+  [/current(ly)? (located|reside|live)|where (are|do) you (live|located)|current location|your location|what is your location/i, 'current_location'],
+  [/how did you hear|hear about (us|this|the|our)|referral source|how.*found.*(us|role|position)/i, 'how_did_you_hear'],
+  [/\bage\b|how old are you/i, 'current_age'],
 
   // Compensation / availability
   [/notice period/i, 'notice_period'],
@@ -45,6 +49,7 @@ const KEYWORD_MAP = [
   [/(how many )?years?.*(experience|exp\b)/i, 'years_total_experience'],
 
   // Experience / domain knowledge — narrative answers
+  [/client.?facing|agentic systems?|tell us about your experience/i, 'experience_with_ai_strategy'],
   [/senior leadership|executive (forum|presentation)|c-?suite|board.*present/i, 'senior_leadership_presentations'],
   [/global platform|platform ownership|own(ed|ing) (a )?(global )?platform/i, 'global_platform_ownership'],
   [/ai strategy/i, 'experience_with_ai_strategy'],

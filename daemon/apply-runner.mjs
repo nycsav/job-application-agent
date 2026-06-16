@@ -198,7 +198,7 @@ export async function runOnce({ hours = 24, maxSubmissions = 5, dryRun = false }
         job_url: result.url || `https://www.linkedin.com/jobs/view/${id}/`,
         source: 'LinkedIn Alert (daemon)',
         portfolio_links: 'ensolabs.ai/work',
-        resume_link: 'PDF: Sav_Banerjee_Resume_2026_v2.pdf',
+        resume_link: 'PDF: Sav_Banerjee_Resume_2026_v3.pdf', // latest; matches config/candidate.json resume.default_path
         cover_letter_link: result.status === 'applied' ? 'N/A - Easy Apply' : 'Pending generation',
         form_url: result.url || `https://www.linkedin.com/jobs/view/${id}/`,
         status:

@@ -20,7 +20,13 @@
     "daemon:relay:read": "node daemon/relay-client.mjs read",
     "daemon:install": "cp daemon/launchd/com.sav.job-apply-daemon.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.sav.job-apply-daemon.plist",
     "daemon:uninstall": "launchctl unload ~/Library/LaunchAgents/com.sav.job-apply-daemon.plist && rm ~/Library/LaunchAgents/com.sav.job-apply-daemon.plist",
-    "daemon:status": "launchctl list | grep com.sav.job-apply-daemon"
+    "daemon:status": "launchctl list | grep com.sav.job-apply-daemon",
+    "submit-ready": "node daemon/submit-ready.mjs",
+    "submit-ready:dry": "node daemon/submit-ready.mjs --dry-run",
+    "submit-ready:dry-mock": "node daemon/submit-ready.mjs --dry-run --mock",
+    "submit-ready:install": "cp daemon/launchd/com.sav.job-auto-submit.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.sav.job-auto-submit.plist",
+    "submit-ready:uninstall": "launchctl unload ~/Library/LaunchAgents/com.sav.job-auto-submit.plist && rm ~/Library/LaunchAgents/com.sav.job-auto-submit.plist",
+    "submit-ready:status": "launchctl list | grep com.sav.job-auto-submit"
   },
   "dependencies": {
     "docx": "^9.1.1",

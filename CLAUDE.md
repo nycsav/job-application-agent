@@ -82,6 +82,41 @@ Sav Banerjee — sav@ensopartners.co
 - PreToolBatch hook blocks any click on Submit/Apply buttons without confirmation
 - Records confirmation numbers and updates tracker
 
+### 4. Submit-Ready Daemon (`daemon/submit-ready.mjs`) — added 2026-06-08, hardened 2026-06-12
+The Notion-first batch submitter. Human-triggered: `npm run submit-ready` (live, cap 7/run),
+`npm run submit-ready:dry` (no browser). What it does per run:
+- Queries Notion for Status = **"Materials Ready" + "Approved"** (paginated), sorted by Fit Score
+- Validates: exclusions (Perplexity/BOI/Sia), score ≥ 5, salary floor $180K FTE / $85/hr
+- **Dedup (2026-06-12):** two keys checked against Applied rows AND within the queue —
+  (1) company+title normalized with stopwords stripped, (2) normalized apply-URL.
+  Duplicates are auto-archived in Notion with a `[DEDUP <date>]` note in Fit Reason.
+- **Cover letters (2026-06-12):** every submission carries one. Looks up
+  `output/cover-letters/<company-slug>_<title-slug>.md` (hand-written letters win; never
+  overwritten), else generates from verified_metrics with role-aware emphasis, then converts
+  to .docx via lib/docx-builder. Attached on Greenhouse/Ashby (label-aware file-input
+  detection); pasted into Lever's additional-info box. Manual-queue roles get letters staged too.
+- **Platform routing:** Greenhouse/Ashby/Lever → autonomous Playwright form fill (canned
+  answers from candidate.json easy_apply_answers for known questions); **LinkedIn → Easy Apply
+  bot** (`daemon/easy-apply-bot.mjs`, persistent logged-in profile in .secrets/browser-profile);
+  Workday/iCIMS/Oracle/Dice/Indeed/custom → MANUAL REQUIRED list with materials pre-staged.
+- On success: Notion Status → Applied + Applied Date; audit screenshots in `.audit/<date>/`;
+  briefing to `output/briefings/submit-ready-*.txt` + JSON log in `.logs/`.
+
+### Schedulers (state as of 2026-06-15)
+- **Cloud routine (claude.ai/code/routines):** scan + stage only — prompt source:
+  `claude-code-handoff/routine-prompt.md` (model: Opus 4.8 — Fable unavailable as of
+  2026-06-15, reverts to the CLAUDE.md default; set in the routine's model picker).
+- **Local scheduled task `job-pipeline-daily`** (Claude Code desktop, model claude-opus-4-8,
+  12:30 PM & 5:30 PM weekdays — fires after the cloud scan): verifies the scanner staged roles,
+  dry-runs the queue, attempts the live batch (no-ops to a readiness briefing if Bash permission
+  for live submit is absent), reports applied/manual/dups/failed. Runs only while the desktop app
+  is open. Confirmed firing (last runs 2026-06-14); net new submissions still 0 — see daemon notes.
+- **launchd is BROKEN on this machine:** agents under ~/Documents exit 78 (EX_CONFIG — macOS
+  TCC denies background access to Documents). `com.sav.job-apply-daemon` (legacy, Sheet-era)
+  has not completed a run since 2026-05-29 and conflicts with Notion-first dedup — uninstall it
+  (`npm run daemon:uninstall`). To make `com.sav.job-auto-submit.plist` work, /usr/local/bin/node
+  needs Full Disk Access (System Settings → Privacy & Security), then `npm run submit-ready:install`.
+
 ## Score Thresholds (Constants in scanner.mjs)
 ```
 MINIMUM_SHEET_SCORE = 5      // Below this = don't track
@@ -204,11 +239,17 @@ claude "Read routines/daily-scan.md and execute the steps"
 - Certifications: Perplexity AI Business Fellowship, CrewAI Multi-Agent, Anthropic Claude, Google AI Essentials
 
 ## Safety Rules
-- NEVER auto-submit applications without human approval
-- NEVER apply to Perplexity
+- **Autonomous submission AUTHORIZED (Sav, 2026-06-12)** — but ONLY through
+  `daemon/submit-ready.mjs` / `daemon/easy-apply-bot.mjs`, which enforce the full guard stack:
+  exclusion list, score ≥ 5 gate, $180K/$85hr salary floor, two-key dedup (title + URL),
+  batch cap 7/run, audit screenshots, Notion status trail. This supersedes the previous
+  "never auto-submit" rule for the daemon path. The interactive Submitter Agent
+  (`agents/submitter.mjs`) keeps its mandatory human gate.
+- NEVER apply to Perplexity, BOI/Board of Innovation, Sia Partners, Sia Experience
 - NEVER fabricate metrics or client names
-- If CAPTCHA or login required, STOP and ask user
-- Take screenshots at every major step for audit trail
+- If CAPTCHA or login wall appears, the run stops for that role and flags it — never solve
+  CAPTCHAs or re-enter credentials autonomously
+- Take screenshots at every major step for audit trail (.audit/<date>/)
 
 ## Workflow Safety Guards (Added 2026-05-17)
 See `lib/safety-guards.mjs` for full implementation.

@@ -1,0 +1,18 @@
+{
+  "_comment": "Copy this file to the repo root as `.mcp.json`. These are the SAME connectors you authorized in the Claude desktop app (Cowork). On first run Claude Code prompts you to OAuth each one in the browser. Server names here define the tool prefixes the /job-scan command expects: mcp__notion__*, mcp__gmail__*, mcp__dice-jobs__*. Replace the two <FILL_IN> URLs with the connector endpoints from the Claude app > Settings > Connectors (open a connector, 'Copy link'/'Copy MCP URL'). Notion's public endpoint is filled in already.",
+
+  "mcpServers": {
+    "notion": {
+      "type": "http",
+      "url": "https://mcp.notion.com/mcp"
+    },
+    "gmail": {
+      "type": "http",
+      "url": "<FILL_IN: Gmail connector MCP URL from Claude app > Settings > Connectors>"
+    },
+    "dice-jobs": {
+      "type": "http",
+      "url": "<FILL_IN: Job-search (Dice/LinkedIn) connector MCP URL from Claude app > Settings > Connectors>"
+    }
+  }
+}
