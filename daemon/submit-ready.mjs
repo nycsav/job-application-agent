@@ -32,7 +32,7 @@
 
 import { chromium } from 'playwright';
 import { writeFile, readFile, mkdir } from 'fs/promises';
-import { existsSync, mkdirSync, readdirSync, unlinkSync } from 'fs';
+import { existsSync, mkdirSync, readdirSync, unlinkSync, readFileSync, writeFileSync, appendFileSync, openSync, closeSync } from 'fs';
 import { execSync } from 'child_process';
 import { applyTo } from './easy-apply-bot.mjs';
 import { loadAnswers, matchAnswer, numericAnswer } from './canned-answers.mjs';
@@ -41,6 +41,7 @@ import { selectResume as routerSelectResume, verifyResumes } from '../lib/resume
 import { applyToDice } from './dice-adapter.mjs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import os from 'os';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -79,11 +80,93 @@ function cliArg(name, fallback) {
   return v;
 }
 
-const DRY_RUN = cliArg('dry-run', false) === true;
+let DRY_RUN = cliArg('dry-run', false) === true; // may be forced true by the single-submitter guard
+let forcedDryRun = false; // set when the guard downgrades a live run (surfaced in the briefing)
 const MOCK_RUN = cliArg('mock', false) === true; // fake Notion data for dry-run verification
 const MAX_SUBMISSIONS = Number(cliArg('max', DEFAULT_MAX_BATCH));
 const PLATFORM_FILTER = cliArg('platform', null);
 const HEADLESS = process.env.HEADLESS !== 'false';
+
+// ─── Single-submitter guard + single-instance lock ─────────────────
+// TWO atomic layers guarantee exactly ONE submitting process globally — the only
+// airtight defense against double-submission across machines. (A Notion "lock"
+// can't be atomic: Notion has no compare-and-set, so two writers can straddle
+// each other's read-back — proven in the dedup-hardening audit, 2026-06-16.)
+//
+//  (1) CROSS-MACHINE: only the host holding .secrets/submitter.allow (gitignored,
+//      never in git) may LIVE-submit. Fail-CLOSED — an absent marker forces
+//      dry-run, never the reverse. Put the marker on ONLY the Mac Mini → exactly
+//      one machine ever writes to a posting. (File-presence, NOT os.hostname():
+//      macOS Bonjour names drift and would silently lock out the real runner.)
+//  (2) SAME-MACHINE: a local O_EXCL lockfile is a TRUE mutex on one filesystem,
+//      blocking an overlapping cron+manual run. Stale locks (dead PID / age > TTL)
+//      are reclaimed; released on exit, conditional on still owning it.
+const SUBMITTER_MARKER = join(ROOT, '.secrets', 'submitter.allow');
+const LOCK_PATH = join(ROOT, '.secrets', 'submit-ready.lock');
+// 2h backstop. A LIVE holder's batch finishes in well under this, and a live PID
+// is never stolen mid-batch (the reclaim also requires age>TTL); a dead/stuck lock
+// clears after 2h. Bumped from 30 min so a slow 7-role batch can't be reclaimed under it.
+const LOCK_TTL_MS = 2 * 60 * 60 * 1000;
+
+function isPidAlive(pid) {
+  try { process.kill(pid, 0); return true; } catch (e) { return e.code === 'EPERM'; }
+}
+function writeLockFile() {
+  const fd = openSync(LOCK_PATH, 'wx'); // O_EXCL: atomic create-or-fail
+  writeFileSync(fd, JSON.stringify({ pid: process.pid, host: os.hostname(), at: new Date().toISOString() }));
+  closeSync(fd);
+}
+function acquireInstanceLock() {
+  try { writeLockFile(); return true; }
+  catch (e) {
+    if (e.code !== 'EEXIST') throw e;
+    let holder = {};
+    try { holder = JSON.parse(readFileSync(LOCK_PATH, 'utf-8')); } catch {}
+    const ageMs = holder.at ? (Date.now() - Date.parse(holder.at)) : Infinity;
+    const alive = holder.pid ? isPidAlive(holder.pid) : false;
+    if (!alive || ageMs > LOCK_TTL_MS) {
+      console.warn(`[submit-ready] reclaiming stale lock (pid ${holder.pid}, age ${Math.round(ageMs / 1000)}s, alive=${alive})`);
+      try { unlinkSync(LOCK_PATH); } catch {}
+      try { writeLockFile(); return true; } catch { return false; }
+    }
+    return false; // a live sibling run holds it
+  }
+}
+function releaseInstanceLock() {
+  try {
+    const holder = JSON.parse(readFileSync(LOCK_PATH, 'utf-8'));
+    if (holder.pid === process.pid) unlinkSync(LOCK_PATH);
+  } catch { /* no lock / not ours / already gone — fine */ }
+}
+
+// ─── Crash-safe submit ledger ──────────────────────────────────────
+// Two local files close the "submitted but the record was lost" seam — a Notion
+// write failing AFTER a confirmed submit, or a crash in the window right after the
+// irreversible click. Both would otherwise leave the row "Materials Ready" and the
+// next run would re-submit. (Impl-review holes #1/#2/#3, 2026-06-16.)
+//  • submit-inflight.json — written just before each submit, cleared only once a
+//    TERMINAL Notion state (Applied or Needs Review) is recorded. A leftover marker
+//    at the next run's start means a role was interrupted mid-submit → it's
+//    quarantined to Needs Review (verify; never blind-resubmit).
+//  • applied-pageids.log — every confirmed submit's page_id, appended BEFORE the
+//    Notion write, so a confirmed application can never reappear as eligible even if
+//    every Notion write fails. (Same-machine; the single-submitter marker keeps it
+//    to one machine, so a local ledger is sufficient.)
+const INFLIGHT_PATH = join(ROOT, '.secrets', 'submit-inflight.json');
+const APPLIED_LOG = join(ROOT, '.secrets', 'applied-pageids.log');
+const appliedPageIds = (() => {
+  try { return new Set(readFileSync(APPLIED_LOG, 'utf-8').split('\n').map(s => s.trim()).filter(Boolean)); }
+  catch { return new Set(); }
+})();
+function recordAppliedPageId(pageId) {
+  appliedPageIds.add(pageId);
+  try { appendFileSync(APPLIED_LOG, pageId + '\n'); } catch {}
+}
+function setInflight(pageId, label) {
+  try { writeFileSync(INFLIGHT_PATH, JSON.stringify({ page_id: pageId, label, at: new Date().toISOString() })); } catch {}
+}
+function clearInflight() { try { if (existsSync(INFLIGHT_PATH)) unlinkSync(INFLIGHT_PATH); } catch {} }
+function readInflight() { try { return JSON.parse(readFileSync(INFLIGHT_PATH, 'utf-8')); } catch { return null; } }
 
 // ─── Notion REST client ────────────────────────────────────────────
 
@@ -172,7 +255,14 @@ async function queryAppliedKeys(key) {
   let cursor = undefined;
   do {
     const body = {
-      filter: { property: 'Status', select: { equals: 'Applied' } },
+      // Broaden beyond Status=Applied: anything that's been applied to OR is in a
+      // terminal/review state is a dedup anchor (catches a reopened Applied row, or
+      // one the other machine just moved). Broadening can only ADD dedup blocks,
+      // never permit a double-submit. (Audit 2026-06-16, gap "snapshot-only".)
+      filter: { or: [
+        { property: 'Applied Date', date: { is_not_empty: true } },
+        ...['Applied', 'Needs Review', 'Interview', 'Offer', 'Rejected'].map(s => ({ property: 'Status', select: { equals: s } })),
+      ] },
       page_size: 100,
       ...(cursor ? { start_cursor: cursor } : {}),
     };
@@ -198,6 +288,32 @@ async function setNotionArchived(pageId, key, reason, existingFitReason = '') {
       'Fit Reason': { rich_text: [{ text: { content: note } }] },
     },
   }, key);
+}
+
+// Generic status setter — used to quarantine an ambiguous submit to "Needs Review"
+// so it is NEVER auto-resubmitted. Notion auto-creates a missing select option.
+async function setNotionStatus(pageId, key, status, note = '', existingFitReason = '') {
+  const props = { Status: { select: { name: status } } };
+  if (note) props['Fit Reason'] = { rich_text: [{ text: { content: `${note}${existingFitReason ? ' | ' + existingFitReason : ''}`.slice(0, 1900) } }] };
+  return notionFetch('PATCH', `/pages/${pageId}`, { properties: props }, key);
+}
+
+// Live re-read right before an irreversible submit. Another process — or the other
+// machine, were the marker ever duplicated — may have applied since the start-of-run
+// snapshot. Read-only → can only SKIP, never strand/deadlock a row. On ANY uncertainty
+// it returns NOT eligible (bias to never-twice; the role simply retries a later run).
+async function stillEligible(pageId, apiKey) {
+  if (appliedPageIds.has(pageId)) return { eligible: false, status: 'already submitted (local ledger)' };
+  try {
+    const page = await notionFetch('GET', `/pages/${pageId}`, null, apiKey);
+    const status = page.properties?.['Status']?.select?.name || '';
+    const appliedDate = page.properties?.['Applied Date']?.date?.start;
+    if (appliedDate) return { eligible: false, status: `already applied ${appliedDate}` };
+    if (!SUBMIT_STATUSES.includes(status)) return { eligible: false, status: `status now "${status}"` };
+    return { eligible: true, status };
+  } catch (e) {
+    return { eligible: false, status: `re-check failed: ${e.message}` };
+  }
 }
 
 // Maps internal platform keys → the Notion "Platform" select option names.
@@ -622,7 +738,19 @@ async function fillKnownQuestions(page) {
   const unfilled = [];
   for (const f of fields) {
     if (f.tag === 'SELECT' && f.value) continue;
-    if (!f.label || !f.id) { if (f.required && !f.value) unfilled.push(f.label.slice(0, 80) || '(unlabeled field)'); continue; }
+    if (!f.id) {
+      // No id → try filling by accessible label (catches fields like
+      // "What is your current age?" that have a label but no usable id).
+      if (f.label && !f.value) {
+        const m = matchAnswer(f.label, answers);
+        if (m) {
+          const v = f.type === 'number' ? String(numericAnswer(m.value) ?? '') : String(m.value);
+          if (v) { try { await page.getByLabel(f.label, { exact: false }).first().fill(v, { timeout: 2500 }); continue; } catch {} }
+        }
+      }
+      if (f.required && !f.value) unfilled.push((f.label || '(unlabeled field)').slice(0, 80));
+      continue;
+    }
     const match = matchAnswer(f.label, answers);
     if (!match) { if (f.required && !f.value) unfilled.push(f.label.slice(0, 80)); continue; }
     const sel = `[id="${f.id}"]`;
@@ -794,14 +922,20 @@ async function submitGreenhouse(page, role, formData, resumePath, coverLetter, a
     return { ok: false, reason: 'Submit button not found on Greenhouse form' };
   }
   await submitBtn.click();
-  await page.waitForTimeout(4000);
-
-  await page.screenshot({ path: join(auditDir, `${slug}-after.png`), fullPage: true });
-  const text = await page.evaluate(() => document.body.innerText);
+  // Past the irreversible click — a failure READING the outcome must become an
+  // "unconfirmed" result (→ quarantine), never a throw (→ treated as not-submitted). (Hole #2.)
+  let text = '';
+  try {
+    await page.waitForTimeout(4000);
+    await page.screenshot({ path: join(auditDir, `${slug}-after.png`), fullPage: true });
+    text = await page.evaluate(() => document.body.innerText);
+  } catch (e) {
+    return { ok: false, unconfirmed: true, reason: `clicked submit but could not read outcome: ${e.message}` };
+  }
   const outcome = readSubmitOutcome(text);
   const why = outcome.ok ? 'Confirmed'
     : `${outcome.negative ? `Form rejected: ${outcome.negative}` : 'Could not confirm'} — screenshot saved${unfilledRequired.length ? `; required fields unanswered: ${unfilledRequired.join(' | ')}` : ''}`;
-  return { ok: outcome.ok, reason: why, snippet: text.slice(0, 300) };
+  return { ok: outcome.ok, unconfirmed: !outcome.ok && !outcome.negative, reason: why, snippet: text.slice(0, 300) };
 }
 
 async function submitAshby(page, role, formData, resumePath, coverLetter, auditDir) {
@@ -905,10 +1039,10 @@ async function submitAshby(page, role, formData, resumePath, coverLetter, auditD
     if (outcome.ok || outcome.negative) break;
   }
 
-  await page.screenshot({ path: join(auditDir, `${slug}-after.png`), fullPage: true });
+  await page.screenshot({ path: join(auditDir, `${slug}-after.png`), fullPage: true }).catch(() => {});
   const why = outcome.ok ? 'Confirmed'
     : `${outcome.negative ? `Form rejected: ${outcome.negative}` : 'Could not confirm'} — screenshot saved${unfilledRequired.length ? `; required fields unanswered: ${unfilledRequired.join(' | ')}` : ''}`;
-  return { ok: outcome.ok, reason: why, snippet: text.slice(0, 300) };
+  return { ok: outcome.ok, unconfirmed: !outcome.ok && !outcome.negative, reason: why, snippet: text.slice(0, 300) };
 }
 
 async function submitLever(page, role, formData, resumePath, coverLetter, auditDir) {
@@ -959,14 +1093,20 @@ async function submitLever(page, role, formData, resumePath, coverLetter, auditD
     return { ok: false, reason: 'Submit button not found on Lever form' };
   }
   await submitBtn.click();
-  await page.waitForTimeout(4000);
-
-  await page.screenshot({ path: join(auditDir, `${slug}-after.png`), fullPage: true });
-  const text = await page.evaluate(() => document.body.innerText);
+  // Past the irreversible click — a failure READING the outcome must become an
+  // "unconfirmed" result (→ quarantine), never a throw (→ treated as not-submitted). (Hole #2.)
+  let text = '';
+  try {
+    await page.waitForTimeout(4000);
+    await page.screenshot({ path: join(auditDir, `${slug}-after.png`), fullPage: true });
+    text = await page.evaluate(() => document.body.innerText);
+  } catch (e) {
+    return { ok: false, unconfirmed: true, reason: `clicked submit but could not read outcome: ${e.message}` };
+  }
   const outcome = readSubmitOutcome(text);
   const why = outcome.ok ? 'Confirmed'
     : `${outcome.negative ? `Form rejected: ${outcome.negative}` : 'Could not confirm'} — screenshot saved${unfilledRequired.length ? `; required fields unanswered: ${unfilledRequired.join(' | ')}` : ''}`;
-  return { ok: outcome.ok, reason: why, snippet: text.slice(0, 300) };
+  return { ok: outcome.ok, unconfirmed: !outcome.ok && !outcome.negative, reason: why, snippet: text.slice(0, 300) };
 }
 
 // ─── Briefing writer ───────────────────────────────────────────────
@@ -988,6 +1128,10 @@ async function writeBriefing(summary) {
   const lines = [
     `Submit-Ready Daemon${summary.dry_run ? ' [DRY RUN]' : ''}`,
     `Run: ${summary.started_at} → ${summary.finished_at || '(in progress)'}`,
+    ...(summary.forced_dry_run
+      ? ['⚠ FORCED DRY-RUN — this host is NOT the authorized submitter (.secrets/submitter.allow absent).',
+         '  Materials were staged but NOTHING was submitted. The Mac Mini (marker holder) is the live submitter.']
+      : []),
     '═══════════════════════════════════════',
     '',
     `APPLIED (${applied.length})`,
@@ -1042,6 +1186,34 @@ async function main() {
     console.warn(`[submit-ready] WARNING: missing resume file(s): ${rcheck.missing.join(', ')} — check config/candidate.json resume paths`);
   }
 
+  // ─── Single-submitter guard (cross-machine) ───────────────────────
+  // Fail-CLOSED: no marker on this host → force the whole run to dry-run.
+  if (!existsSync(SUBMITTER_MARKER) && !DRY_RUN && !MOCK_RUN) {
+    console.warn('\n' + '═'.repeat(66));
+    console.warn('[submit-ready] SINGLE-SUBMITTER GUARD: this host is NOT the');
+    console.warn(`  designated submitter (${SUBMITTER_MARKER} absent).`);
+    console.warn('  Forcing DRY-RUN — will query + stage materials but NEVER submit.');
+    console.warn('  Only the machine holding that marker (the Mac Mini) submits.');
+    console.warn('═'.repeat(66) + '\n');
+    DRY_RUN = true;
+    forcedDryRun = true;
+  }
+
+  // ─── Single-instance lock (same-machine) ──────────────────────────
+  // Only live runs contend; dry/mock never submit. A second concurrent run exits
+  // cleanly rather than racing. Released on exit (and SIGINT/SIGTERM); a crashed
+  // run's lock is reclaimed by the next run via the dead-PID / TTL check.
+  if (!DRY_RUN && !MOCK_RUN) {
+    if (!acquireInstanceLock()) {
+      console.warn('[submit-ready] another submit-ready run holds the lock — exiting to avoid a concurrent double-submit.');
+      process.exit(0);
+    }
+    console.log(`[submit-ready] instance lock acquired (pid ${process.pid}).`);
+    process.on('exit', releaseInstanceLock);
+    process.on('SIGINT', () => { releaseInstanceLock(); process.exit(130); });
+    process.on('SIGTERM', () => { releaseInstanceLock(); process.exit(143); });
+  }
+
   // Pre-flight: clear a stale browser-profile lock from a prior unclean exit.
   // A zombie Chromium silently locks .secrets/browser-profile → every Playwright
   // launch errors "profile already in use" and the whole run no-ops. Caught
@@ -1077,6 +1249,7 @@ async function main() {
   const summary = {
     started_at,
     dry_run: DRY_RUN,
+    forced_dry_run: forcedDryRun, // host not authorized to submit → staged only, no submissions
     applied: [],
     manual_required: [],
     skipped: [],
@@ -1093,6 +1266,23 @@ async function main() {
     } catch (err) {
       console.error(`[submit-ready] FATAL: ${err.message}`);
       process.exit(1);
+    }
+  }
+
+  // Crash recovery: a leftover in-flight marker means a prior run died mid-submit.
+  // That role MAY have gone through → quarantine to Needs Review (never blind-resubmit).
+  // Runs BEFORE the queue query so the quarantined row drops out of the submit queue.
+  if (!DRY_RUN && !MOCK_RUN && notionKey) {
+    const inflight = readInflight();
+    if (inflight?.page_id) {
+      console.warn(`[submit-ready] crash recovery: "${inflight.label || inflight.page_id}" was mid-submit when a prior run ended — quarantining to Needs Review (verify before retry).`);
+      try {
+        await setNotionStatus(inflight.page_id, notionKey, 'Needs Review', `Interrupted mid-submit ${inflight.at} — a prior run ended after the submit click; verify whether it went through before any retry.`);
+        recordAppliedPageId(inflight.page_id); // also block via the local ledger
+        clearInflight();
+      } catch (e) {
+        console.error(`[submit-ready]   recovery quarantine failed (marker kept for next run): ${e.message}`);
+      }
     }
   }
 
@@ -1128,12 +1318,48 @@ async function main() {
   if (!MOCK_RUN) {
     try {
       appliedKeys = await queryAppliedKeys(notionKey);
-      console.log(`[submit-ready] Dedup cache: ${appliedKeys.size} Applied roles loaded`);
+      console.log(`[submit-ready] Dedup cache: ${appliedKeys.size} prior/in-flight roles loaded`);
     } catch (err) {
-      console.warn(`[submit-ready] WARN: could not load Applied rows for dedup: ${err.message}`);
+      // A blind dedup cache means every role looks un-applied → mass double-submit.
+      // For a LIVE run this is FATAL — abort rather than submit blind. (Audit 2026-06-16.)
+      if (!DRY_RUN) {
+        console.error(`[submit-ready] FATAL: dedup cache load failed on a live run — aborting to avoid double-submits: ${err.message}`);
+        summary.errors.push({ role: 'dedup-cache', error: `aborted live run — dedup unavailable: ${err.message}` });
+        summary.finished_at = new Date().toISOString();
+        await writeBriefing(summary);
+        process.exit(1);
+      }
+      console.warn(`[submit-ready] WARN (dry-run): dedup cache unavailable: ${err.message}`);
     }
   }
   const queueKeys = new Map();
+
+  // Records a CONFIRMED submit so it can NEVER be re-sent — even if the Notion write
+  // fails. In-memory + local ledger FIRST (cannot fail), then Notion; a Notion failure
+  // quarantines to "Needs Review" (never back to a re-submittable state), and if even
+  // that fails the in-flight marker is left for next-run recovery. (Impl-review hole #1.)
+  const recordApplied = async (r, k, uk, meta, lbl) => {
+    appliedKeys.set(k, `${r.title} @ ${r.company}`);
+    if (uk) appliedKeys.set(uk, `${r.title} @ ${r.company}`);
+    recordAppliedPageId(r.page_id);
+    if (MOCK_RUN || !notionKey) { clearInflight(); return; }
+    try { await setNotionApplied(r.page_id, notionKey, meta); clearInflight(); }
+    catch (e) {
+      console.error(`[submit-ready]   ⚠ APPLIED but Notion write failed: ${e.message} — quarantining (will NOT resubmit).`);
+      try {
+        await setNotionStatus(r.page_id, notionKey, 'Needs Review', `APPLIED ${new Date().toISOString().split('T')[0]} but Notion write failed — DO NOT resubmit; verify + mark Applied: ${e.message}`, r.fit_reason);
+        clearInflight();
+      } catch (e2) {
+        summary.errors.push({ role: lbl, error: `applied-but-unrecorded (VERIFY MANUALLY): ${e.message}` });
+      }
+    }
+  };
+  // Quarantines an AMBIGUOUS submit to "Needs Review" so it never auto-resubmits.
+  const quarantineRole = async (r, note, lbl) => {
+    if (MOCK_RUN || !notionKey) { clearInflight(); return; }
+    try { await setNotionStatus(r.page_id, notionKey, 'Needs Review', note, r.fit_reason); clearInflight(); }
+    catch (e) { summary.errors.push({ role: lbl, error: `quarantine failed (left in-flight for next-run recovery): ${e.message}` }); }
+  };
 
   for (const page of pages) {
     if (submissionCount >= MAX_SUBMISSIONS) {
@@ -1179,6 +1405,18 @@ async function main() {
     queueKeys.set(key, `${role.title} @ ${role.company} [${role.status}]`);
     if (uKey) queueKeys.set(uKey, `${role.title} @ ${role.company} [${role.status}]`);
 
+    // Live re-check backstop — confirm STILL eligible immediately before any
+    // irreversible submit (catches a role another process applied to mid-run,
+    // which the start-of-run snapshot can't see). Read-only; skip-on-uncertainty.
+    if (!DRY_RUN && !MOCK_RUN && notionKey) {
+      const re = await stillEligible(role.page_id, notionKey);
+      if (!re.eligible) {
+        console.log(`[submit-ready]   SKIP (live re-check): ${re.status}`);
+        summary.duplicates.push({ ...role, reason: `Live re-check: ${re.status}` });
+        continue;
+      }
+    }
+
     // Platform
     const platform = detectPlatform(role.apply_url);
     if (PLATFORM_FILTER && platform !== PLATFORM_FILTER) {
@@ -1198,25 +1436,29 @@ async function main() {
       }
       try {
         console.log(`[submit-ready]   Easy Apply: ${jobId || role.apply_url}`);
+        setInflight(role.page_id, label);
         const res = await applyTo(jobId, jobId ? {} : { url: role.apply_url });
         if (res.status === 'applied' || (res.status === 'skipped' && /already submitted/i.test(res.reason || ''))) {
           if (res.status === 'applied') submissionCount++;
-          if (!MOCK_RUN && notionKey) await setNotionApplied(role.page_id, notionKey, { resume: 'LinkedIn default profile (v3)', coverLetter: 'N/A — Easy Apply', platform: 'linkedin', companyUrl: urlOrigin(role.apply_url), applyUrl: role.apply_url });
-          appliedKeys.set(key, `${role.title} @ ${role.company}`);
+          await recordApplied(role, key, uKey, { resume: 'LinkedIn default profile (v3)', coverLetter: 'N/A — Easy Apply', platform: 'linkedin', companyUrl: urlOrigin(role.apply_url), applyUrl: role.apply_url }, label);
           console.log(`[submit-ready]   ✓ ${res.status === 'applied' ? 'APPLIED via Easy Apply' : 'ALREADY SUBMITTED on LinkedIn — status synced'}`);
           summary.applied.push({ ...role, platform, resume: 'LinkedIn default profile', cover_letter: 'N/A — Easy Apply', result: res });
         } else if (res.status === 'saved_in_progress' || res.status === 'materials_ready') {
+          clearInflight();
           const qs = (res.unanswered_questions || []).map(q => q.label).filter(Boolean).join(' | ');
           console.log(`[submit-ready]   ! NEEDS HUMAN: ${res.reason || qs}`);
           summary.manual_required.push({ ...role, platform, reason: res.reason || `Easy Apply saved in progress — unanswered: ${qs}` });
         } else if (res.status === 'skipped') {
+          clearInflight();
           console.log(`[submit-ready]   SKIP: ${res.reason}`);
           summary.skipped.push({ ...role, platform, reason: res.reason });
         } else {
+          clearInflight();
           console.log(`[submit-ready]   ✗ FAILED: ${res.reason}`);
           summary.failed.push({ ...role, platform, result: res });
         }
       } catch (err) {
+        clearInflight();
         console.error(`[submit-ready]   ERROR: ${err.message}`);
         summary.errors.push({ role: label, error: err.message });
       }
@@ -1240,21 +1482,30 @@ async function main() {
       if (process.env.DICE_LIVE === '1' && !DRY_RUN) {
         try {
           console.log(`[submit-ready]   Dice adapter (live-verify): ${role.apply_url}`);
+          setInflight(role.page_id, label);
           const res = await applyToDice(role, { resumePath: resumeForRole, coverLetter: cl, formData, dryRun: false });
           if (res.ok || res.status === 'applied') {
             submissionCount++;
-            if (!MOCK_RUN && notionKey) await setNotionApplied(role.page_id, notionKey, { resume: resumeForRole.split('/').pop(), coverLetter: cl ? cl.docxPath.split('/').pop() : '(none)', platform: 'dice', companyUrl: urlOrigin(role.apply_url), applyUrl: role.apply_url });
-            appliedKeys.set(key, `${role.title} @ ${role.company}`);
+            await recordApplied(role, key, uKey, { resume: resumeForRole.split('/').pop(), coverLetter: cl ? cl.docxPath.split('/').pop() : '(none)', platform: 'dice', companyUrl: urlOrigin(role.apply_url), applyUrl: role.apply_url }, label);
             console.log(`[submit-ready]   ✓ APPLIED via Dice`);
             summary.applied.push({ ...role, platform, resume: resumeForRole.split('/').pop(), cover_letter: cl ? cl.docxPath.split('/').pop() : null, result: res });
           } else if (res.status === 'redirect' && res.url) {
+            clearInflight();
             console.log(`[submit-ready]   Dice → external redirect (${res.platform}); routing MANUAL`);
             summary.manual_required.push({ ...role, platform: res.platform || 'redirect', reason: `Dice redirected to ${res.platform || 'external ATS'}: ${res.url}`, resume: resumeForRole.split('/').pop(), cover_letter: cl ? cl.docxPath.split('/').pop() : null });
+          } else if (res.unconfirmed) {
+            // Submit clicked but outcome unconfirmed — quarantine, never auto-resubmit. (Hole #4.)
+            console.log(`[submit-ready]   ⚠ Dice UNCONFIRMED → Needs Review (will NOT auto-retry): ${res.reason}`);
+            await quarantineRole(role, `Dice submit unconfirmed ${new Date().toISOString().split('T')[0]} — verify before any retry: ${res.reason}`, label);
+            summary.failed.push({ ...role, platform, result: res, quarantined: true });
           } else {
-            console.log(`[submit-ready]   ✗ Dice unconfirmed: ${res.reason}`);
+            // Pre-submit failure (never clicked) — safe to retry. Clear marker.
+            clearInflight();
+            console.log(`[submit-ready]   ✗ Dice failed: ${res.reason}`);
             summary.failed.push({ ...role, platform, result: res });
           }
         } catch (err) {
+          clearInflight();
           console.error(`[submit-ready]   Dice ERROR: ${err.message}`);
           summary.errors.push({ role: label, error: err.message });
         }
@@ -1306,6 +1557,7 @@ async function main() {
       );
       const pg = await browser.newPage();
 
+      setInflight(role.page_id, label); // crash-safety: cleared once a terminal state is recorded
       let result;
       if (platform === 'greenhouse') result = await submitGreenhouse(pg, role, formData, resumePath, coverLetter, auditDir);
       else if (platform === 'ashby')   result = await submitAshby(pg, role, formData, resumePath, coverLetter, auditDir);
@@ -1314,19 +1566,27 @@ async function main() {
 
       if (result.ok) {
         submissionCount++;
-        if (!MOCK_RUN && notionKey) await setNotionApplied(role.page_id, notionKey, { resume: resumePath.split('/').pop(), coverLetter: coverLetter ? coverLetter.docxPath.split('/').pop() : '(none)', platform, companyUrl: urlOrigin(role.apply_url), applyUrl: role.apply_url });
-        appliedKeys.set(key, `${role.title} @ ${role.company}`);
+        await recordApplied(role, key, uKey, { resume: resumePath.split('/').pop(), coverLetter: coverLetter ? coverLetter.docxPath.split('/').pop() : '(none)', platform, companyUrl: urlOrigin(role.apply_url), applyUrl: role.apply_url }, label);
         console.log(`[submit-ready]   ✓ APPLIED${MOCK_RUN ? ' [MOCK — Notion NOT updated]' : ''}`);
         summary.applied.push({ ...role, platform, resume: resumePath.split('/').pop(), cover_letter: coverLetter ? coverLetter.docxPath.split('/').pop() : null, result });
+      } else if (result.unconfirmed) {
+        // AMBIGUOUS outcome — the submit MAY have gone through. Quarantine so it is
+        // NEVER auto-resubmitted (that would double-apply). Human verifies. (Audit 2026-06-16.)
+        console.log(`[submit-ready]   ⚠ UNCONFIRMED → Needs Review (will NOT auto-retry): ${result.reason}`);
+        await quarantineRole(role, `Submit unconfirmed ${new Date().toISOString().split('T')[0]} — verify before any retry: ${result.reason}`, label);
+        summary.failed.push({ ...role, platform, result, quarantined: true });
       } else {
+        // True rejection (form bounced) — did NOT submit; safe to retry. Clear marker.
+        clearInflight();
         console.log(`[submit-ready]   ✗ FAILED: ${result.reason}`);
         summary.failed.push({ ...role, platform, result });
-        // Leave Notion as "Materials Ready" — will retry next run
       }
     } catch (err) {
+      // Pre-click / launch errors (post-click read failures are returned as
+      // unconfirmed by the submitters, NOT thrown) → did-not-submit; clear marker.
+      clearInflight();
       console.error(`[submit-ready]   ERROR: ${err.message}`);
       summary.errors.push({ role: label, error: err.message });
-      // Leave Notion status unchanged so it retries
     } finally {
       if (browser) await browser.close().catch(() => {});
     }

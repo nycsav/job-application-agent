@@ -24,6 +24,8 @@
     "submit-ready": "node daemon/submit-ready.mjs",
     "submit-ready:dry": "node daemon/submit-ready.mjs --dry-run",
     "submit-ready:dry-mock": "node daemon/submit-ready.mjs --dry-run --mock",
+    "submit-ready:enable": "mkdir -p .secrets && touch .secrets/submitter.allow && echo 'AUTHORIZED: this machine is now the live submitter (.secrets/submitter.allow created). Run ONLY on the Mac Mini.'",
+    "submit-ready:disable": "rm -f .secrets/submitter.allow && echo 'DISABLED: live submit off on this machine — runs are forced to dry-run.'",
     "submit-ready:install": "cp daemon/launchd/com.sav.job-auto-submit.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.sav.job-auto-submit.plist",
     "submit-ready:uninstall": "launchctl unload ~/Library/LaunchAgents/com.sav.job-auto-submit.plist && rm ~/Library/LaunchAgents/com.sav.job-auto-submit.plist",
     "submit-ready:status": "launchctl list | grep com.sav.job-auto-submit"

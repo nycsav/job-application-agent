@@ -45,6 +45,13 @@ Branch with today's work: **`mac-mini-handoff`** on `origin` (github.com/nycsav/
 > 5. Verify the pipeline end-to-end WITHOUT submitting: `node daemon/submit-ready.mjs --dry-run`.
 >    Expect it to query Notion (queue + dedup) and stage cover letters with no errors. The daemon
 >    self-heals a missing browser / stale profile lock / transient Notion blip on startup.
+> 5b. **CREATE THE SINGLE-SUBMITTER MARKER — ONLY on the Mac Mini:** `touch .secrets/submitter.allow`.
+>    This file (gitignored, never in git) is what AUTHORIZES this machine to LIVE-submit. The daemon
+>    fail-closes: any host WITHOUT it is forced to dry-run no matter what flags it's given. This is the
+>    cross-machine double-submit guarantee — exactly ONE machine holds the marker, so exactly one
+>    machine ever writes an application. **Never create this file on the MacBook Pro.** Confirm it's
+>    the ONLY machine with it. (A local O_EXCL lockfile `.secrets/submit-ready.lock` additionally
+>    prevents two runs overlapping on THIS machine — it's automatic, nothing to set up.)
 > 6. Recreate the scheduled task on THIS machine (so it runs here): create a scheduled task named
 >    `job-pipeline-daily`, cron `0 9,13 * * 1-5`, model `claude-opus-4-8`, using the prompt body in
 >    `~/.claude/scheduled-tasks/job-pipeline-daily/SKILL.md` from the MacBook (AirDrop that file too if
@@ -61,7 +68,19 @@ Branch with today's work: **`mac-mini-handoff`** on `origin` (github.com/nycsav/
 ## What stays where (so nothing's double-run)
 - **Cloud scan routine** (claude.ai/code/routines): unchanged, runs in the cloud — keep it on.
 - **Submit pipeline + scheduled task**: now on the **Mac Mini** (after this setup).
-- **MacBook Pro**: once the Mac Mini is verified submitting, **disable/delete the `job-pipeline-daily`
-  task on the MacBook** so the two don't both submit (dedup would catch it, but cleaner to run one).
-- Notion remains the single shared source of truth — both machines read/write the same DB, and the
-  two-key dedup (company+title + apply-URL) prevents duplicate applications across machines.
+- **MacBook Pro**: its `job-pipeline-daily` task is **already disabled** (2026-06-16), and the
+  single-submitter guard now FORCES it to dry-run even if invoked — so it can never live-submit.
+
+## No-double-submit guarantee (hardened 2026-06-16, audit + adversarial review)
+Belt-and-suspenders, ordered from the real guarantee outward:
+1. **Single-submitter marker** (`.secrets/submitter.allow`, Mac Mini only) → exactly ONE machine can
+   live-submit. Fail-closed: no marker = dry-run. This is THE cross-machine guarantee.
+2. **Local O_EXCL lockfile** (`.secrets/submit-ready.lock`) → one submit process per machine; a second
+   concurrent run exits cleanly. Stale locks (dead PID / >30 min) auto-reclaimed.
+3. **Live re-check** before every submit → re-reads the row's current status; skips if another run
+   already took it. **Broadened dedup cache** (any Applied Date / terminal status, both keys) blocks
+   re-applying. **Hard-fail** if the dedup cache can't load on a live run (never submits blind).
+4. **"Could not confirm" → "Needs Review"** → an ambiguous submit is quarantined, NEVER auto-retried
+   (the one vector that could double-submit a posting that actually went through). A human verifies it.
+- Notion stays the single shared source of truth. Note: a true cross-machine *mutex* is impossible in
+  Notion (no compare-and-set), which is exactly why layer 1 (one machine) is the guarantee, not the lock.

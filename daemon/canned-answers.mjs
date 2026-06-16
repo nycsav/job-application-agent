@@ -31,6 +31,7 @@ const KEYWORD_MAP = [
   [/current(ly)? (located|reside|live)|where (are|do) you (live|located)|current location|your location|what is your location/i, 'current_location'],
   [/how did you hear|hear about (us|this|the|our)|referral source|how.*found.*(us|role|position)/i, 'how_did_you_hear'],
   [/\bage\b|how old are you/i, 'current_age'],
+  [/\bcountry\b|country of residence|what country/i, 'country'],
 
   // Compensation / availability
   [/notice period/i, 'notice_period'],

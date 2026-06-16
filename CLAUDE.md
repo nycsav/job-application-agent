@@ -245,6 +245,16 @@ claude "Read routines/daily-scan.md and execute the steps"
   batch cap 7/run, audit screenshots, Notion status trail. This supersedes the previous
   "never auto-submit" rule for the daemon path. The interactive Submitter Agent
   (`agents/submitter.mjs`) keeps its mandatory human gate.
+- **NO-DOUBLE-SUBMIT GUARANTEE (hardened 2026-06-16 via dedup audit + adversarial review).**
+  Layered, real-guarantee-first: (1) **single-submitter marker** `.secrets/submitter.allow` —
+  ONLY the Mac Mini holds it; any host without it is FORCED to dry-run (fail-closed), so exactly
+  one machine ever live-submits — the cross-machine guarantee (a Notion lock can't be a true mutex,
+  no compare-and-set). (2) Local **O_EXCL lockfile** `.secrets/submit-ready.lock` — one submit
+  process per machine; stale locks (dead PID / >30 min) auto-reclaimed. (3) **Live re-check** before
+  each submit + **broadened dedup cache** (Applied Date / terminal statuses, both keys) + **hard-fail**
+  if the dedup cache can't load on a live run (never submits blind). (4) **"Could not confirm" →
+  "Needs Review"** quarantine — an ambiguous submit is NEVER auto-retried (human verifies). The
+  MacBook's `job-pipeline-daily` task is disabled AND the guard forces it to dry-run.
 - NEVER apply to Perplexity, BOI/Board of Innovation, Sia Partners, Sia Experience
 - NEVER fabricate metrics or client names
 - If CAPTCHA or login wall appears, the run stops for that role and flags it — never solve

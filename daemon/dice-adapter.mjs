@@ -773,6 +773,7 @@ export async function applyToDice(role, opts = {}) {
     return {
       status: 'failed',
       platform: 'dice',
+      unconfirmed: !outcome.negative, // clicked submit; ambiguous (not a clean rejection) → quarantine upstream
       reason: outcome.negative ? `Form rejected: ${outcome.negative}` : 'Submit clicked but outcome unconfirmed',
       snippet: text.slice(0, 300),
       audit: { before: beforeShot, after: afterShot },
