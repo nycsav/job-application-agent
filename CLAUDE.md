@@ -82,6 +82,17 @@ Sav Banerjee — sav@ensopartners.co
 - PreToolBatch hook blocks any click on Submit/Apply buttons without confirmation
 - Records confirmation numbers and updates tracker
 
+## Parallel Manager (orchestrator) — `agents/manager.mjs`
+The discovery side runs as a **manager + parallel workers** pattern (see
+`docs/parallel-agent-architecture.html` + `docs/AGENT-MANAGER-DESIGN.md`). The manager:
+delegates to the parallel source specialists (`agents/parallel-scanner.mjs`), runs an
+**acceptance check on every worker output**, dedups through the **one keyed writer**
+(`keyedStage()` in `lib/notion-writer.mjs`, using the shared `dedupeKey()` from
+`lib/dedup.mjs`), tailors (resume pick via `lib/resume-picker.mjs`), and stages a
+**click-ready shortlist** + a **"needs you"** bucket — with an `Agent Trail` on every write.
+It **owns the human gate and never submits** (Lane A). Run: `npm run manager` (fixture-backed,
+no creds) or `npm run pipeline:parallel`. Submit stays human-gated via `agents/notion-submitter.mjs`.
+
 ## Score Thresholds (Constants in scanner.mjs)
 ```
 MINIMUM_SHEET_SCORE = 5      // Below this = don't track

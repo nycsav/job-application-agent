@@ -1,0 +1,55 @@
+diff --git a/src/dedup.ts b/src/dedup.ts
+new file mode 100644
+index 0000000..7bbc27a
+--- /dev/null
++++ b/src/dedup.ts
+@@ -0,0 +1,28 @@
++// Shared dedup key for the Career Command Center.
++// Must match lib/dedup.mjs in job-application-agent so BOTH writers dedupe alike.
++const STOP = /\b(the|a|an|of|and|inc|llc|ltd|corp|co|group)\b/g;
++
++export function normalize(s = ""): string {
++  return String(s)
++    .toLowerCase()
++    .replace(/[‘’“”]/g, "'")
++    .replace(/&/g, " and ")
++    .replace(/[^a-z0-9 ]+/g, " ")
++    .replace(STOP, " ")
++    .replace(/\s+/g, " ")
++    .trim();
++}
++
++export function dedupeKey(company = "", title = ""): string {
++  return `${normalize(company)}|${normalize(title)}`;
++}
++
++export function urlKey(jobUrl = ""): string {
++  const u = String(jobUrl);
++  const m =
++    u.match(/greenhouse\.io\/[^/]+\/jobs\/(\d+)/i) ||
++    u.match(/lever\.co\/[^/]+\/([0-9a-f-]{36})/i) ||
++    u.match(/linkedin\.com\/jobs\/view\/(\d+)/i) ||
++    u.match(/jobs?\/(\d{6,})/i);
++  return m ? m[1].toLowerCase() : "";
++}
+diff --git a/src/index.ts b/src/index.ts
+index 864d79c..5b14daa 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -4,6 +4,7 @@ import { Worker } from "@notionhq/workers";
+ import { j } from "@notionhq/workers/schema-builder";
+ import * as Schema from "@notionhq/workers/schema";
+ import * as Builder from "@notionhq/workers/builder";
++import { dedupeKey, urlKey } from "./dedup";
+ 
+ const worker = new Worker();
+ export default worker;
+@@ -345,7 +346,7 @@ worker.sync("jobBoardSync", {
+     const changes = [];
+     for (const job of jobs) {
+       const match = await scoreJobMatch(job.title, job.company, job.requirements, userProfile);
+-      const jobId = `${job.source}-${job.externalId}`;
++      const jobId = urlKey(job.url) || dedupeKey(job.company, job.title); // shared dedup key
+ 
+       changes.push({
+         key: jobId,

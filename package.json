@@ -7,22 +7,18 @@
     "scan": "node agents/scanner.mjs",
     "generate": "node agents/materials.mjs",
     "submit": "node agents/submitter.mjs",
+    "submit:notion": "node agents/notion-submitter.mjs",
+    "queue:notion": "node lib/notion-queue.mjs Approved",
+    "manager": "node agents/manager.mjs",
     "pipeline": "node orchestrator.mjs",
+    "pipeline:parallel": "node orchestrator.mjs --manager",
     "test": "node lib/test-templates.mjs",
     "scan:personal": "node agents/personal-gmail-scanner.mjs",
     "scan:personal:24h": "node agents/personal-gmail-scanner.mjs --hours 24",
-    "gmail:setup": "node lib/gmail-auth.mjs",
-    "daemon:login": "node daemon/easy-apply-bot.mjs --login",
-    "daemon:apply": "node daemon/easy-apply-bot.mjs --apply",
-    "daemon:run": "node daemon/run-once.mjs",
-    "daemon:run:dry": "node daemon/run-once.mjs --dry-run",
-    "daemon:relay:scan": "node daemon/relay-client.mjs scan",
-    "daemon:relay:read": "node daemon/relay-client.mjs read",
-    "daemon:install": "cp daemon/launchd/com.sav.job-apply-daemon.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.sav.job-apply-daemon.plist",
-    "daemon:uninstall": "launchctl unload ~/Library/LaunchAgents/com.sav.job-apply-daemon.plist && rm ~/Library/LaunchAgents/com.sav.job-apply-daemon.plist",
-    "daemon:status": "launchctl list | grep com.sav.job-apply-daemon"
+    "gmail:setup": "node lib/gmail-auth.mjs"
   },
   "dependencies": {
+    "@notionhq/client": "^2.2.15",
     "docx": "^9.1.1",
     "googleapis": "^144.0.0",
     "playwright": "^1.48.0"

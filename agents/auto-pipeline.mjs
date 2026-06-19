@@ -11,7 +11,7 @@
  *   6. Generate cover letter via template engine (dynamic hook generation)
  *   7. Convert to ATS-optimized DOCX
  *   8. Upload to Google Drive
- *   9. Write to Google Sheet + Notion
+ *   9. Write to Notion Career Command Center (single source of truth)
  *  10. Send briefing email summary
  *
  * DESIGNED FOR: Claude Code Routine — 8 AM & 5 PM weekdays
@@ -35,8 +35,7 @@ import {
   generateBriefingEmail as generateNotionBriefingEmail,
   NOTION_DATA_SOURCE_ID
 } from '../lib/notion-writer.mjs';
-// Legacy sheet-writer kept for read-only fallback only
-import { appendRow, checkDuplicate, readRows } from '../lib/sheet-writer.mjs';
+// Google Sheet legacy path retired 2026-06-19 — Notion is the single source of truth.
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -333,7 +332,7 @@ function generateBriefingEmail(results, stats) {
  * Step 2: SCORE & FILTER
  *   - Call scoreRole() on each extracted role
  *   - Filter: skip score < 5, skip EXCLUDE_COMPANIES
- *   - Check dedup via sheet-writer.mjs checkDuplicate()
+ *   - Check dedup via the canonical keyed writer: keyedStage() / findDuplicate() (lib/dedup.mjs)
  *
  * Step 3: MATCH RESUME
  *   - Call matchResume() with the role and loaded resume_map.json
@@ -350,11 +349,11 @@ function generateBriefingEmail(results, stats) {
  *   - FALLBACK: Google Drive MCP (create_file) — legacy, being retired
  *   - Materials: matched resume PDF + generated cover letter .docx
  *
- * Step 6: WRITE TO NOTION (PRIMARY) + SHEET (ARCHIVE)
- *   - PRIMARY: Use Notion MCP (notion-create-pages) with buildNotionPage()
+ * Step 6: WRITE TO NOTION (single source of truth)
+ *   - Use Notion MCP (notion-create-pages) with buildNotionPage()
  *     Data source: 931eceb1-d35d-46ca-9d4a-7fbfa48d3f99
- *   - DEDUP: Run buildDedupQuery() → notion-search → checkNotionDuplicate()
- *   - ARCHIVE: Optionally write to Google Sheet via appendRow() (read-only backup)
+ *   - DEDUP: keyedStage() checks the shared dedupeKey() BEFORE inserting; the
+ *     buildDedupQuery() → notion-search → checkNotionDuplicate() path is the fallback.
  *
  * Step 7: SEND BRIEFING EMAIL
  *   - Use Gmail MCP (create_draft) with generateBriefingEmail()
@@ -397,8 +396,7 @@ export {
   NOTION_DATA_SOURCE_ID
 } from '../lib/notion-writer.mjs';
 
-// Legacy sheet-writer (read-only archive fallback)
-export { appendRow, checkDuplicate, readRows } from '../lib/sheet-writer.mjs';
+// Google Sheet legacy writer retired 2026-06-19 (Notion is the single source of truth).
 
 // ─── Standalone test ────────────────────────────────────────────
 
