@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job Agent — System Map (environments · gate · safeguards)</title>
+<style>
+  :root{
+    --ink:#0e1726;--slate:#475569;--line:#cbd5e1;--bg:#f6f8fb;
+    --blue:#2563eb;--bluebg:#eff6ff;--blueln:#bfdbfe;
+    --amber:#b45309;--amberbg:#fff7ec;--amberln:#fde2b3;
+    --green:#15803d;--greenbg:#f0fdf4;--greenln:#bbf7d0;
+    --violet:#6d28d9;--violetbg:#f5f3ff;--violetln:#ddd6fe;
+    --red:#b91c1c;--redbg:#fef2f2;--redln:#fecaca;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.42;padding:34px 20px}
+  .wrap{max-width:1100px;margin:0 auto}
+  h1{font-size:26px;margin:0 0 4px;letter-spacing:-.4px}
+  .sub{font-size:15px;color:var(--slate);margin:0 0 8px}
+  .lane-locked{font-size:13px;font-weight:700;color:var(--ink);background:#fff;border:1.5px solid var(--ink);
+    border-radius:10px;padding:8px 13px;margin:10px 0 18px;display:inline-block}
+  .lane-locked b{color:var(--blue)}
+  h2.sec{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--slate);margin:22px 0 9px}
+  .envs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .env{border-radius:14px;border:1px solid;padding:15px}
+  .env.cloud{background:var(--bluebg);border-color:var(--blueln)}
+  .env.board{background:var(--violetbg);border-color:var(--violetln)}
+  .env.mac{background:var(--amberbg);border-color:var(--amberln)}
+  .env h3{display:flex;align-items:center;gap:7px;font-size:14px;margin:0 0 2px}
+  .env .host{font-size:11.5px;color:var(--slate);margin:0 0 10px}
+  .tag{font-size:9.5px;font-weight:800;color:#fff;padding:2px 7px;border-radius:20px;white-space:nowrap}
+  .tag.b{background:var(--blue)} .tag.v{background:var(--violet)} .tag.a{background:var(--amber)}
+  .step{background:#fff;border:1px solid var(--line);border-radius:9px;padding:7px 9px;font-size:12px;margin-bottom:6px}
+  .step b{font-weight:700}
+  .step .s{display:block;font-size:11px;color:var(--slate)}
+  .arrow{text-align:center;color:var(--slate);font-weight:800;font-size:15px;margin:1px 0}
+  .flowrow{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0;flex-wrap:wrap}
+  .flowrow .chip{font-size:11.5px;color:var(--slate);background:#fff;border:1px solid var(--line);border-radius:20px;padding:5px 11px}
+  .writer{margin:12px 0;text-align:center;font-size:12.5px;background:#fff;border:1.5px dashed var(--blue);border-radius:10px;padding:10px}
+  .writer b{color:var(--blue)}
+  .gate{margin:14px 0;background:var(--ink);color:#fff;border-radius:12px;padding:13px 18px;display:flex;align-items:center;gap:13px}
+  .gate .lk{font-size:23px}
+  .gate .t{font-weight:800;font-size:14px}
+  .gate .d{font-size:12px;color:#c7d2e6}
+  .cols2{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-top:6px}
+  .panel{border-radius:14px;border:1px solid var(--line);background:#fff;padding:14px}
+  .panel.safe{background:var(--greenbg);border-color:var(--greenln)}
+  .panel h3{font-size:13px;margin:0 0 9px;display:flex;align-items:center;gap:7px}
+  ul.sg{margin:0;padding-left:0;list-style:none}
+  ul.sg li{font-size:12px;padding:5px 0;border-bottom:1px dashed #e2e8f0}
+  ul.sg li:last-child{border-bottom:0}
+  ul.sg b{color:var(--green)}
+  .branch{font-size:12px;padding:8px 10px;border-radius:9px;margin-bottom:8px;border:1px solid}
+  .branch.keep{background:var(--bluebg);border-color:var(--blueln)}
+  .branch.decide{background:var(--redbg);border-color:var(--redln)}
+  .branch.fold{background:var(--violetbg);border-color:var(--violetln)}
+  .branch .h{font-weight:800;font-size:11.5px;letter-spacing:.2px}
+  .branch .b{color:var(--slate);font-size:11.5px}
+  .foot{margin-top:18px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:11px;color:var(--slate)}
+  .foot span{background:#fff;border:1px solid var(--line);border-radius:20px;padding:5px 11px}
+  code{background:#eef2f7;border-radius:5px;padding:1px 5px;font-size:11.5px}
+  @media(max-width:860px){.envs{grid-template-columns:1fr}.cols2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Job Application Agent — System Map</h1>
+  <p class="sub">Where each piece runs, where the one human gate sits, and what keeps it safe.</p>
+  <div class="lane-locked">🔒 Operating rule (Lane A, locked): <b>AI finds → scores → dedups → tailors → stages.</b> &nbsp;Sav clicks Submit. No application is ever sent without you.</div>
+
+  <h2 class="sec">Three environments, two engines, one source of truth</h2>
+  <div class="envs">
+
+    <!-- CLOUD -->
+    <div class="env cloud">
+      <h3>☁️ Claude Code on the web <span class="tag b">ENGINE 1 · COLLECT &amp; PICK</span></h3>
+      <p class="host">Anthropic cloud · runs on a Routine (8am/5pm) even with the laptop closed · <b>connectors, no browser</b></p>
+      <div class="step"><b>Manager</b><span class="s">agents/manager.mjs — plan · delegate · validate every worker · own the gate</span></div>
+      <div class="arrow">↓ fans out (parallel)</div>
+      <div class="step"><b>Source workers</b><span class="s">Gmail/Ladders · Indeed · Dice · career pages — Promise.allSettled</span></div>
+      <div class="arrow">↓</div>
+      <div class="step"><b>Score → keyed dedup → tailor</b><span class="s">rubric 0–10 · dedupeKey() · resume pick</span></div>
+      <div class="step" style="background:#fffbe9;border-color:#fde68a"><b>⚠ needs a PRIVATE repo</b><span class="s">candidate.json + resumes are gitignored on the public repo → cloud run has no PII unless the Routine points at a private repo</span></div>
+    </div>
+
+    <!-- BOARD -->
+    <div class="env board">
+      <h3>📋 Notion Command Center <span class="tag v">SINGLE SOURCE OF TRUTH</span></h3>
+      <p class="host">the front end you actually look at · DB <code>8ce2a0e3…</code></p>
+      <div class="step"><b>Click-ready shortlist</b><span class="s">verified apply link + resume picked + score ≥ 8</span></div>
+      <div class="step"><b>“Needs you” bucket</b><span class="s">staged but flagged: verify link / missing resume / tracking-only</span></div>
+      <div class="step"><b>Status + Agent Trail</b><span class="s">New → Approved → Applied → Interview → Offer · who/when/why on every write</span></div>
+      <div class="arrow">⟵ written by Engine 1 · approved by you · read by Engine 2 ⟶</div>
+    </div>
+
+    <!-- MAC -->
+    <div class="env mac">
+      <h3>🖥️ Mac Mini — Claude Code terminal <span class="tag a">ENGINE 2 · APPLY &amp; FILE</span></h3>
+      <p class="host">always-on at home · <b>browser + your logged-in sessions + the real PII</b> live here</p>
+      <div class="step"><b>Read the Approved queue</b><span class="s">npm run queue:notion (lib/notion-queue.mjs)</span></div>
+      <div class="arrow">↓</div>
+      <div class="step"><b>Playwright fills the ATS</b><span class="s">npm run submit:notion · Greenhouse/Ashby/Lever/Workday/Apply4Me</span></div>
+      <div class="arrow">↓</div>
+      <div class="step" style="background:#fef2f2;border-color:#fecaca"><b>🛑 STOPS before Submit</b><span class="s">block-submit hook (exit 2) — you click</span></div>
+      <div class="arrow">↓ after your click</div>
+      <div class="step"><b>File back</b><span class="s">Notion → Applied + date · Gmail → AI-Applied label</span></div>
+    </div>
+  </div>
+
+  <div class="writer">Both engines meet at <b>one keyed writer</b> — <code>keyedStage()</code> in <code>lib/notion-writer.mjs</code> checks the shared <code>dedupeKey()</code> (URL req-id, then normalized Company+Title) <b>before</b> any insert, so parallel agents never duplicate a row.</div>
+
+  <div class="gate">
+    <div class="lk">🔒</div>
+    <div><div class="t">THE GATE — you approve, in Notion</div>
+    <div class="d">Move a row to “Approved” = the only thing that lets Engine 2 fill it. Submit itself is still your click. The one rule the whole system is built on.</div></div>
+  </div>
+
+  <div class="cols2">
+    <!-- SAFEGUARDS -->
+    <div class="panel safe">
+      <h3>🛡️ Safeguards in place</h3>
+      <ul class="sg">
+        <li><b>Human gate at the irreversible step</b> — nothing submits without your click (Lane A).</li>
+        <li><b>Enforcing PreToolUse hook</b> — <code>hooks/block-submit.mjs</code> hard-blocks (exit 2) any click on a Submit/Apply control.</li>
+        <li><b>One keyed writer + shared dedup</b> — <code>keyedStage()</code>/<code>dedupeKey()</code> stop duplicate rows across every source and writer.</li>
+        <li><b>Score gate</b> — no submit unless a real score ≥ 5 is recorded (null/undefined hard-blocked).</li>
+        <li><b>Qualification gate</b> — auto-skips roles needing a CS degree or hands-on IC coding (not Sav’s profile).</li>
+        <li><b>Permanent blacklist</b> — Perplexity + BOI never scanned/scored/applied.</li>
+        <li><b>Batch limit</b> — max 7 submissions/session, then a forced pause.</li>
+        <li><b>Acceptance checks</b> — the manager validates every worker output before passing it on.</li>
+        <li><b>“Applied” only after a real submit</b> — never speculative (a false record makes you skip a live role).</li>
+        <li><b>PII never in git</b> — <code>candidate.json</code>, resumes, tokens are gitignored; email access is read-only.</li>
+        <li><b>Audit trail</b> — every write carries who/when/why (Agent Trail).</li>
+      </ul>
+    </div>
+
+    <!-- BRANCH RECONCILIATION -->
+    <div class="panel">
+      <h3>🌿 Branch reconciliation (the real sprawl)</h3>
+      <div class="branch keep">
+        <div class="h">✅ KEEP — this work (Lane A)</div>
+        <div class="b">stoic → <code>youthful-curie</code>: parallel manager + one keyed writer + cleanup. Human-gated, Notion = source of truth.</div>
+      </div>
+      <div class="branch decide">
+        <div class="h">⚠ DECIDE — <code>mac-mini-handoff</code></div>
+        <div class="b">Hardens the <i>auto-submit</i> daemon (always-on runner, crash-safe ledger). <b>Conflicts</b> with retiring the daemon. Pick: human-gated submit (recommended) <i>or</i> unattended runner.</div>
+      </div>
+      <div class="branch fold">
+        <div class="h">↪ FOLD/ARCHIVE — <code>Codex</code></div>
+        <div class="b">A 3rd “local-first” orchestrator with its own local ledger (not the shared Notion DB). Pull in any better scoring ideas, then archive to avoid a 3rd data store.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>Recommendation: discovery on ☁️ web Routine (private repo) · submit on 🖥️ Mac Mini · approve in 📋 Notion</span>
+    <span>Out of scope here: <code>notion-career-agent</code> Worker (separate repo — dedup .patch ready)</span>
+  </div>
+</div>
+</body>
+</html>
