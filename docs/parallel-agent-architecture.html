@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job Agent — Parallel Agent Architecture</title>
+<style>
+  :root{--ink:#0e1726;--blue:#2563eb;--bluebg:#eff6ff;--blueln:#bfdbfe;
+    --amber:#b45309;--amberbg:#fff7ec;--amberln:#fde2b3;--slate:#475569;--line:#cbd5e1;--bg:#f6f8fb;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.4;padding:36px 22px}
+  .wrap{max-width:1040px;margin:0 auto}
+  h1{font-size:27px;margin:0 0 4px;letter-spacing:-.4px}
+  .sub{font-size:16px;color:var(--slate);margin:0 0 22px}
+  .mgr{background:var(--ink);color:#fff;border-radius:14px;padding:16px 20px;text-align:center;margin-bottom:8px}
+  .mgr .t{font-size:16px;font-weight:800;letter-spacing:.3px}
+  .mgr .d{font-size:13px;color:#c7d2e6}
+  .split{display:flex;justify-content:center;gap:8px;color:var(--slate);font-size:22px;margin:2px 0}
+  .lanes{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .lane{border-radius:14px;padding:16px;border:1px solid}
+  .lane.back{background:var(--bluebg);background:var(--bluebg);border-color:var(--blueln)}
+  .lane.front{background:var(--amberbg);border-color:var(--amberln)}
+  .lane h2{display:flex;align-items:center;gap:8px;font-size:13px;text-transform:uppercase;letter-spacing:.6px;margin:0 0 3px}
+  .tag{font-size:10px;font-weight:800;color:#fff;padding:2px 8px;border-radius:20px}
+  .tag.b{background:var(--blue)} .tag.a{background:var(--amber)}
+  .lane .where{font-size:12px;color:var(--slate);margin:0 0 12px}
+  .fan{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}
+  .node{background:#fff;border:1px solid var(--line);border-radius:9px;padding:7px 9px;font-size:12px;font-weight:600}
+  .node .s{display:block;font-size:11px;color:var(--slate);font-weight:400}
+  .chain{display:flex;flex-direction:column;gap:6px}
+  .row{display:flex;align-items:center;gap:7px;font-size:12.5px}
+  .pill{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-weight:600;flex:1}
+  .arr{color:var(--slate);font-weight:700}
+  .writer{margin:10px 0;text-align:center;font-size:12.5px;color:var(--ink);background:#fff;border:1.5px dashed var(--blue);border-radius:10px;padding:9px}
+  .writer b{color:var(--blue)}
+  .gate{margin:12px 0 8px;background:var(--ink);color:#fff;border-radius:12px;padding:13px 18px;display:flex;align-items:center;gap:12px}
+  .gate .lk{font-size:24px}
+  .gate .t{font-weight:800;font-size:14px}
+  .gate .d{font-size:12px;color:#c7d2e6}
+  .submit{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+  .sp{font-size:12.5px;font-weight:700;color:var(--amber);background:var(--amberbg);border:1px solid var(--amberln);border-radius:9px;padding:8px 12px}
+  .foot{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:11.5px;color:var(--slate)}
+  .foot span{background:#fff;border:1px solid var(--line);border-radius:20px;padding:5px 11px}
+  @media(max-width:720px){.lanes{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Job Agent — Parallel Agent Architecture</h1>
+  <p class="sub">One manager. Back-end <b>finds</b> and front-end <b>shows</b> — at the same time. You approve. A submit-layer sends.</p>
+
+  <div class="mgr">
+    <div class="t">🧭 MANAGER AGENT (orchestrator)</div>
+    <div class="d">plans · delegates to sub-agents · validates every output · owns the gate + audit trail</div>
+  </div>
+  <div class="split">⤡&nbsp;&nbsp;&nbsp;&nbsp;⤢</div>
+
+  <div class="lanes">
+    <!-- BACK END -->
+    <div class="lane back">
+      <h2>Back end — Discovery <span class="tag b">PARALLEL SUB-AGENTS</span></h2>
+      <p class="where">Runs in the cloud. 4 scanners fan out concurrently.</p>
+      <div class="fan">
+        <div class="node">Gmail / Ladders<span class="s">alerts</span></div>
+        <div class="node">Indeed<span class="s">search API</span></div>
+        <div class="node">Dice<span class="s">search API</span></div>
+        <div class="node">Career pages<span class="s">target cos</span></div>
+      </div>
+      <div class="chain">
+        <div class="row"><span class="pill">Scorer — rubric 0–10</span></div>
+        <div class="row"><span class="arr">↓</span><span class="pill">Dedup — shared key</span></div>
+        <div class="row"><span class="arr">↓</span><span class="pill">Tailor — resume pick + letter</span></div>
+      </div>
+    </div>
+
+    <!-- FRONT END -->
+    <div class="lane front">
+      <h2>Front end — Live board <span class="tag a">SIMULTANEOUS</span></h2>
+      <p class="where">Updates the moment back-end results land. What you see.</p>
+      <div class="chain">
+        <div class="row"><span class="pill">📋 Notion Career Command Center</span></div>
+        <div class="row"><span class="arr">↓</span><span class="pill">✅ Click-ready shortlist (verified link + resume)</span></div>
+        <div class="row"><span class="arr">↓</span><span class="pill">🔔 "Needs you" + status / audit trail</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="writer">Both lanes meet at <b>one keyed writer</b> — every insert checks <code>dedupeKey()</code> first, so parallel agents never duplicate.</div>
+
+  <div class="gate">
+    <div class="lk">🔒</div>
+    <div><div class="t">THE GATE — you approve</div>
+    <div class="d">No application sends without you. The one rule the whole system is built on.</div></div>
+  </div>
+
+  <div class="submit">
+    <span class="sp">Ladders Apply4Me — humans submit</span>
+    <span class="sp">Simplify Copilot — fills, you click</span>
+    <span class="sp">Browserbase / Stagehand — v2, gated</span>
+  </div>
+
+  <div class="foot">
+    <span>Cross-cutting: 👁 Observability (Agent Trail on every write)</span>
+    <span>🔑 Shared dedup key</span>
+    <span>🔒 Human gate before submit</span>
+  </div>
+</div>
+</body>
+</html>
