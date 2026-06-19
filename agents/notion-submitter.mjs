@@ -24,6 +24,7 @@ import { dirname, join } from 'path';
 import { getApprovedRoles, markApplied } from '../lib/notion-queue.mjs';
 import { PLATFORM_STRATEGIES, getCandidateFormData } from './submitter.mjs';
 import { preFlightCheckNotion } from '../lib/notion-writer.mjs';
+import { pickResume } from '../lib/resume-picker.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -48,23 +49,32 @@ function buildPlan(role, candidate, sessionCount, maxBatch) {
   }
 
   const strategy = PLATFORM_STRATEGIES[role.platform] || PLATFORM_STRATEGIES.custom;
+  const resume = pickResume({ title: role.title, resumeVersion: role.resumeVersion });
+  const warnings = [...preflight.warnings];
+  if (!resume.exists) {
+    warnings.push(`RESUME FILE MISSING on disk: ${resume.file} — upload it to materials/resumes/ before submitting.`);
+  }
   return {
     pageId: role.pageId,
     company: role.company,
     title: role.title,
     apply_url: role.jobUrl,
     platform: strategy.name,
-    resume_version: role.resumeVersion || 'default',
+    resume_cluster: resume.cluster,
+    resume_file: resume.file,
+    resume_path: resume.absPath,
+    resume_present: resume.exists,
     steps: [
       ...strategy.steps,
+      `📎 Upload resume PDF: ${resume.absPath}`,
       '✅ AFTER human-approved submit: call markApplied(pageId) → Notion Status=Applied + Applied Date',
       '✅ THEN: move the source email to the AI-Applied Gmail label',
     ],
     selectors: strategy.selectors || {},
-    formData: getCandidateFormData(candidate),
+    formData: { ...getCandidateFormData(candidate), resume_path: resume.absPath },
     note: strategy.note || null,
     human_approval_required: true,
-    warnings: preflight.warnings,
+    warnings,
   };
 }
 
@@ -104,7 +114,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
         }
         console.log(`${i + 1}. 📋 ${p.company} — ${p.title}  [${p.platform}]`);
         console.log(`   Apply: ${p.apply_url || '(no URL — open via company careers)'}`);
-        console.log(`   Resume: ${p.resume_version}`);
+        console.log(`   Resume: ${p.resume_file} ${p.resume_present ? '✅' : '❌ MISSING'}`);
+        if (p.warnings?.length) console.log(`   ⚠️  ${p.warnings.join(' | ')}`);
         console.log(`   → Claude Code + Playwright fills this, then STOPS before Submit for approval.\n`);
       });
       console.log('Run this under Claude Code with Playwright MCP to execute the gated submits.\n');
