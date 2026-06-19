@@ -12,7 +12,7 @@ capabilities that don't live in the same place:
 |---|---|---|---|
 | **1 — Collect & Pick** | Claude (cloud session) | Scan inbox + boards → score → dedup → stage to Notion | Has the connectors (Gmail, Indeed, Dice, Notion). Read-only on email. **No browser.** |
 | **GATE** | You | Approve the queue in Notion (one screen) | The one rule the whole system is built on: nothing submits without you. |
-| **2 — Apply & File** | Local Playwright daemon on your Mac | Open ATS → fill from profile → submit → file back | The browser + your logged-in sessions (LinkedIn/Ladders/ATS) live here. |
+| **2 — Apply & File** | Claude Code + Playwright MCP on your Mac (`npm run submit:notion`) | Read the Approved queue → fill the ATS from profile → **stop for you to click Submit** → file back | The browser + your logged-in sessions (LinkedIn/Ladders/ATS) live here. The old unattended Easy-Apply daemon was retired (ToS/ban risk). |
 
 ### Why not "apply from the cloud session"
 The cloud session can read email and write Notion, but it has **no web browser**.
@@ -31,7 +31,8 @@ employer's application form either. The apply step still belongs to the Mac runn
 3. **Stage** — write "New" rows to the Career Command Center with fit score, assigned
    resume variant, and apply link.
 4. **GATE** — you review and approve in Notion (move to `Approved`).
-5. **Apply** — `node daemon/apply-runner.mjs` on your Mac fills + submits each approved role.
+5. **Apply** — `npm run submit:notion` (Claude Code + Playwright MCP) on your Mac reads the
+   Approved queue, fills each ATS form, and **stops before Submit** for your click.
 6. **File** — email → `AI-Applied` Gmail label · Notion → `Applied` (+ Applied Date) · calendar logged.
 
 ## Integrity rules (non-negotiable)
@@ -44,5 +45,6 @@ employer's application form either. The apply step still belongs to the Mac runn
 ```bash
 # one-time: restore config/candidate.json + config/gmail-credentials.json + token locally
 npm install
-node daemon/apply-runner.mjs --hours 24 --max-submissions 5   # gated; stops at the submit confirm
+npm run queue:notion       # show the Approved queue (read-only)
+npm run submit:notion      # Claude Code + Playwright fills each form; STOPS before Submit for your click
 ```
