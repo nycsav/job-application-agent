@@ -9,6 +9,7 @@
     "submit": "node agents/submitter.mjs",
     "submit:notion": "node agents/notion-submitter.mjs",
     "queue:notion": "node lib/notion-queue.mjs Approved",
+    "resolve:links": "node agents/resolve-links.mjs",
     "manager": "node agents/manager.mjs",
     "pipeline": "node orchestrator.mjs",
     "pipeline:parallel": "node orchestrator.mjs --manager",
