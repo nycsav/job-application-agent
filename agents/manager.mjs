@@ -61,6 +61,35 @@ export function validateScore(score) {
   return typeof score === 'number' && Number.isFinite(score) && score >= 0 && score <= 10;
 }
 
+/**
+ * TAILOR stage, part 2 — the cover-letter task attached to every click-ready role.
+ * The letter is ~80% fixed template (templates/master_cover_letter.md); only
+ * OPENER / WHY_FIT_SECTIONS / CLOSER are generated per role. The orchestrating
+ * Claude session executes this task (generate hooks JSON → fill template via
+ * agents/auto-pipeline.generateCoverLetterDirect → docx if needed) and attaches
+ * the draft to the Notion row. Sav reviews before it's ever sent — letters are
+ * drafted automatically, approved humanly, same as the submit gate.
+ */
+export function buildLetterTask(role, resume) {
+  return {
+    template: 'templates/master_cover_letter.md',
+    fill_via: 'agents/auto-pipeline.mjs → generateCoverLetterDirect(role, hooks, candidate)',
+    rules: [
+      'Under 400 words.',
+      'Metrics VERBATIM from config/candidate.json verified_metrics — never invent or round.',
+      'Reference at least one live URL (ensolabs.ai or ensolabs.ai/insights).',
+      `Match the tone of the picked resume — ${resume.cluster}: ${resume.angle || ''}`,
+      'No confidential client details beyond what the resumes themselves state.',
+    ],
+    generate: {
+      opener: `1-2 sentences. Bold and specific to ${role.company} — lead with what Sav BUILDS, not what he wants.`,
+      why_fit: '3-4 bullets mapping THIS job description\'s requirements to verified experience (each with an exact metric).',
+      closer: '1-2 sentences connecting Sav\'s specific experience to their specific need. Confident, not pleading.',
+    },
+    jd_excerpt: `${role.description || ''} ${role.requirements || ''}`.trim().slice(0, 700),
+  };
+}
+
 /** Why a staged role is NOT yet click-ready (drives the "needs you" bucket). */
 function clickReadyGaps(role, resume) {
   const gaps = [];
@@ -156,7 +185,7 @@ export async function runManager(ctx = {}, opts = {}) {
       status: 'New',
     };
     if (gaps.length === 0) {
-      shortlist.push({ ...entry, letterTask: 'pending — generate via agents/materials.mjs' });
+      shortlist.push({ ...entry, letter: buildLetterTask(role, resume) });
     } else {
       needsYou.push({ ...entry, reasons: gaps });
     }
