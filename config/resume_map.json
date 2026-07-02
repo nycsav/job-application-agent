@@ -2,6 +2,7 @@
   "_description": "Maps role types to Sav's pre-approved resume PDFs. Pipeline picks the right resume — no regeneration. Updated 2026-06-24 to the new 4-archetype resume set (replaces the prior 5-cluster set; partnerships + PMM now fold into enterprise_growth).",
   "_usage": "Honor an explicit Notion 'Resume Version' first (see lib/resume-picker.mjs clusterFromVersion); otherwise match role title/JD against best_for (first match wins); else use the default.",
   "_resume_set_updated": "2026-06-24",
+  "_provenance_note": "Each entry's 'source' records the Drive file + its modifiedTime at ingest. To check staleness: compare Drive's current 'Modified' date against source.drive_modified — if Drive is newer, re-ingest (re-read the PDF, refresh angle/best_for, bump _resume_set_updated).",
   "_contact_on_resumes": {
     "_note": "These 4 resumes use the ensolabs.ai contact. Keep config/candidate.json in sync so generated cover letters match.",
     "email": "sav@ensolabs.ai",
@@ -13,6 +14,7 @@
   "resumes": {
     "forward_deployed": {
       "file": "materials/resumes/Sav_Banerjee_ForwardDeployed.pdf",
+      "source": { "drive_file_id": "1qQwqhlDOs3WCQBJXssQRtg-oE_GejxKI", "drive_created": "2026-06-22T22:42:07Z", "drive_modified": "2026-06-24T11:42:47Z", "size_bytes": 152774, "ingested": "2026-06-24T13:22Z" },
       "headline": "Forward-Deployed AI Architect · AI Transformation · Agentic Systems · Enterprise GTM",
       "angle": "The most technical variant. Leads with hands-on production builds: agentic workflows on Claude + MCP, Google ADK / Managed Agents, LangGraph; autonomous financial AI agents; a 731-document enterprise intelligence platform. Frontier-platform builder (Google I/O 2026 partner). Use when the role wants someone who architects AND ships, embedded with client engineering.",
       "best_for": [
@@ -34,6 +36,7 @@
     },
     "managed_services": {
       "file": "materials/resumes/Sav_Banerjee_ManagedServices.pdf",
+      "source": { "drive_file_id": "1UXcLaVfNQ2rfwrdhfOTQuhyIeESySGey", "drive_created": "2026-06-22T22:46:36Z", "drive_modified": "2026-06-24T11:42:51Z", "size_bytes": 98904, "ingested": "2026-06-24T13:22Z" },
       "headline": "AI Transformation · Managed Services · Agentic Systems",
       "angle": "Advisory + managed-services / MD variant. Leads with a productized retainer practice (Claude Managed Services — offering, pricing, intake, delivery playbooks), MD-level delivery, and 'sell the roadmap then stand up the platform.' Best for consulting firms, fractional/contract, and managed-delivery mandates.",
       "best_for": [
@@ -55,6 +58,7 @@
     },
     "enterprise_growth": {
       "file": "materials/resumes/Sav_Banerjee_EnterpriseGrowth.pdf",
+      "source": { "drive_file_id": "1irTr2OIwgtG9Bs4ZAhJXPclab4JbmPzo", "drive_created": "2026-06-22T22:47:23Z", "drive_modified": "2026-06-24T11:42:55Z", "size_bytes": 106506, "ingested": "2026-06-24T13:22Z" },
       "headline": "Enterprise Growth & AI Strategy · Perplexity AI Business Fellow · 20+ Live Deployments",
       "angle": "Growth / GTM / commercial variant. Leads with closing-and-expanding AI engagements, enterprise product demonstrations as proof-of-depth, BD and account growth, and moving deals first-conversation to production. Absorbs the old partnerships + product-marketing clusters. Best for GTM-engineer, sales-engineering, BD, partnerships, and growth roles.",
       "best_for": [
@@ -79,6 +83,7 @@
     },
     "ai_transformation": {
       "file": "materials/resumes/Sav_Banerjee_Master.pdf",
+      "source": { "drive_file_id": "1qD9dqnfc7HLO37KxSa0YAoPgGb9ubtNp", "drive_created": "2026-06-22T22:47:43Z", "drive_modified": "2026-06-24T11:42:58Z", "size_bytes": 106453, "ingested": "2026-06-24T13:22Z" },
       "_is_default": true,
       "headline": "AI Transformation & Growth Strategy · Enterprise Advisory & Agentic AI Deployment",
       "angle": "The generalist / master resume — balanced enterprise AI advisory + transformation strategy + growth, with hands-on credibility. The default when a role is broad AI leadership and doesn't clearly fit a more specialized variant.",
