@@ -162,15 +162,30 @@ The pipeline uses multiple MCP servers simultaneously — each one gives Claude 
 
 The key insight: MCP connectors are dramatically faster and more reliable than browser automation. A Gmail search via MCP takes ~1 second; the same search via browser automation takes 15-20 seconds with scrolling, clicking, and screenshot parsing. We use browser automation only when no MCP exists (LinkedIn) or when the ATS requires visual interaction.
 
-### Parallel Agent Architecture (Planned)
+### Parallel Agent Architecture (Implemented)
 
-The current pipeline runs sequentially: scan → score → generate → submit. The architecture supports parallelism at two levels:
+A **manager (orchestrator) + parallel workers** pattern now drives discovery — see
+[`docs/parallel-agent-architecture.html`](docs/parallel-agent-architecture.html) for the
+visual and [`docs/AGENT-MANAGER-DESIGN.md`](docs/AGENT-MANAGER-DESIGN.md) for the rationale.
 
-1. **Batch scoring** — score multiple roles simultaneously using Claude Code's Task tool to spawn parallel subagents. Each subagent gets one role + the candidate profile and returns a score independently.
-
-2. **Parallel materials generation** — generate tailored resumes for multiple score-8+ roles concurrently. Each subagent selects the appropriate resume cluster, generates the cover letter, and uploads to Drive.
-
-3. **Multi-platform submission** — submit to multiple Tier 1 platforms (LinkedIn Easy Apply, Indeed) in parallel, with a shared deduplication check against the Google Sheet.
+- **Manager** — [`agents/manager.mjs`](agents/manager.mjs). Plans, delegates, runs an
+  **acceptance check on every worker output**, owns the human gate + audit trail, and
+  **never submits**. Run it: `npm run manager` (replays a fixture, no creds needed) or
+  `npm run pipeline:parallel`.
+- **Parallel scanners (back end)** — [`agents/parallel-scanner.mjs`](agents/parallel-scanner.mjs)
+  fans out one source specialist per board (Gmail/Ladders, Indeed, Dice, career pages) with
+  `Promise.allSettled`, so one stalled source can't block the run, then funnels every result
+  through the **same** `scoreRole()` + qualification gate.
+- **One keyed writer (where the lanes meet)** — every insert goes through
+  `keyedStage()` in [`lib/notion-writer.mjs`](lib/notion-writer.mjs), which checks the shared
+  `dedupeKey()` ([`lib/dedup.mjs`](lib/dedup.mjs)) **before** building a payload. This is what
+  lets parallel agents (and the `notion-career-agent` Worker) write one DB without duplicating.
+- **Front-end artifact** — the manager emits a **click-ready shortlist** (verified link +
+  picked resume) plus a **"needs you"** bucket and a structured run log; each staged row
+  carries an `Agent Trail` (who/when/why).
+- **Submit stays human-gated** — Lane A is locked: AI finds → scores → dedups → tailors →
+  stages; Sav clicks submit (Ladders Apply4Me / Simplify Copilot). Enforced by
+  [`hooks/block-submit.mjs`](hooks/block-submit.mjs).
 
 ### Scheduled Routines
 

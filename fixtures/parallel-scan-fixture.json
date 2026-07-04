@@ -1,0 +1,102 @@
+[
+  {
+    "title": "VP, Reasoning Systems",
+    "company": "Dataiku",
+    "location": "New York, NY",
+    "salary": "$270K - $320K",
+    "description": "Lead the reasoning systems org building agentic systems and LLM products for the enterprise. You will own the technology roadmap for RAG and multi-step reasoning, partnering with enterprise consulting teams on production rollouts.",
+    "requirements": "10+ years leading AI/ML or technology teams; experience taking pilots to production.",
+    "url": "https://job-boards.greenhouse.io/dataiku/jobs/5486496004",
+    "isRemote": false
+  },
+  {
+    "title": "Head of Agentic Technologies",
+    "company": "IAB Tech Lab",
+    "location": "New York, NY",
+    "salary": "",
+    "description": "Define the AI strategy for the ad-tech standards body. Build agentic systems and multi-agent tooling; advise members (a Fortune 500 roster) on enterprise consulting engagements and technology adoption.",
+    "requirements": "Senior leader with AI strategy and standards experience.",
+    "url": "https://iabtechlab.com/tech-lab-careers/",
+    "isRemote": false
+  },
+  {
+    "title": "Director, Forward Deployed Engineering",
+    "company": "Accrete",
+    "location": "New York, NY",
+    "salary": "$200K - $260K",
+    "description": "Forward-deployed leader shipping Claude + MCP integrations and multi-agent systems for defense and enterprise customers. Drive pilot to production with customer engineering pods.",
+    "requirements": "Hands-off leadership; deep applied-AI and agentic background.",
+    "url": "",
+    "isRemote": false
+  },
+  {
+    "title": "VP, AI Strategy & Transformation",
+    "company": "FXI",
+    "location": "Remote",
+    "salary": "$220K - $260K",
+    "description": "Own AI strategy and enterprise transformation for a manufacturing leader. Partner with Fortune 500 stakeholders, run enterprise consulting playbooks, and move pilot to production across the org.",
+    "requirements": "Transformation leadership; change management; AI roadmap ownership.",
+    "url": "https://job-boards.greenhouse.io/fxi/jobs/4111222333",
+    "isRemote": true
+  },
+  {
+    "title": "Director, Applied AI",
+    "company": "Snowflake",
+    "location": "New York, NY",
+    "salary": "$250K - $300K",
+    "description": "Lead applied AI for the data cloud: LLM features, RAG retrieval, agentic systems, and multi-agent orchestration shipped to enterprise customers in a fast-moving technology org.",
+    "requirements": "Director-level applied AI leadership; production ML at scale.",
+    "url": "https://careers.snowflake.com/jobs/7788990",
+    "isRemote": false
+  },
+  {
+    "title": "AI Transformation Consultant",
+    "company": "Sand Cherry Associates",
+    "location": "Remote",
+    "salary": "$185K",
+    "description": "Advise clients on AI strategy and enterprise consulting engagements. Boutique consulting firm, technology and telecom focus.",
+    "requirements": "Consulting background; AI advisory delivery.",
+    "url": "https://sandcherryassociates.com/careers/ai-transformation-consultant",
+    "isRemote": true
+  },
+  {
+    "title": "Senior Manager, AI Programs",
+    "company": "Backblaze",
+    "location": "Remote",
+    "salary": "$160K",
+    "description": "Run AI program management for a cloud storage company. LLM tooling and internal enablement.",
+    "requirements": "Program management; AI delivery.",
+    "url": "https://boards.greenhouse.io/backblaze/jobs/3001",
+    "isRemote": true
+  },
+  {
+    "title": "VP Reasoning Systems",
+    "company": "Dataiku Inc.",
+    "location": "New York",
+    "salary": "$270K-$320K",
+    "description": "Reposted variant of the reasoning systems leadership role — agentic systems, LLM, RAG, enterprise consulting. Same posting, different feed.",
+    "requirements": "Same as the canonical posting.",
+    "url": "https://job-boards.greenhouse.io/dataiku/jobs/5486496004",
+    "isRemote": false
+  },
+  {
+    "title": "Junior AI Analyst",
+    "company": "Tech Startup",
+    "location": "New York, NY",
+    "salary": "$95K",
+    "description": "Entry-level analyst supporting an LLM project.",
+    "requirements": "0-2 years experience.",
+    "url": "https://example.com/jobs/junior-ai-analyst",
+    "isRemote": false
+  },
+  {
+    "title": "AI Advisory Lead",
+    "company": "Centric Consulting",
+    "location": "Remote",
+    "salary": "$190K",
+    "description": "Lead AI strategy and enterprise consulting for a national consulting firm serving Fortune 500 clients. Build the AI advisory practice.",
+    "requirements": "Consulting leadership; AI advisory.",
+    "url": "https://job-boards.greenhouse.io/centric/jobs/5550001",
+    "isRemote": true
+  }
+]

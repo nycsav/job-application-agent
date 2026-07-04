@@ -243,7 +243,7 @@ export async function runParallelScan(ctx = {}, notionSeenKeys = new Set()) {
 // `node agents/parallel-scanner.mjs` runs the lead with a fixture so the
 // orchestration + scoring path is verifiable with no live credentials.
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const fixturePath = join(__dirname, '..', 'reports', 'parallel-scan-fixture.json');
+  const fixturePath = join(__dirname, '..', 'fixtures', 'parallel-scan-fixture.json');
   let fixture = [];
   try { fixture = JSON.parse(await readFile(fixturePath, 'utf8')); } catch { /* no fixture */ }
 

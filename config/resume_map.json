@@ -1,98 +1,125 @@
 {
-  "_description": "Maps role types to pre-approved resume PDFs. Pipeline picks the right resume — no regeneration needed.",
-  "_usage": "Match incoming role title/JD against clusters below. Use the first matching cluster. Default to 'ai_builder' if unclear.",
+  "_description": "Maps role types to Sav's pre-approved resume PDFs. Pipeline picks the right resume — no regeneration. Updated 2026-06-24 to the new 4-archetype resume set (replaces the prior 5-cluster set; partnerships + PMM now fold into enterprise_growth).",
+  "_usage": "Honor an explicit Notion 'Resume Version' first (see lib/resume-picker.mjs clusterFromVersion); otherwise match role title/JD against best_for (first match wins); else use the default.",
+  "_resume_set_updated": "2026-06-24",
+  "_provenance_note": "Each entry's 'source' records the Drive file + its modifiedTime at ingest. To check staleness: compare Drive's current 'Modified' date against source.drive_modified — if Drive is newer, re-ingest (re-read the PDF, refresh angle/best_for, bump _resume_set_updated).",
+  "_contact_on_resumes": {
+    "_note": "These 4 resumes use the ensolabs.ai contact. Keep config/candidate.json in sync so generated cover letters match.",
+    "email": "sav@ensolabs.ai",
+    "phone": "415-828-5282",
+    "linkedin": "linkedin.com/in/savbanerjee",
+    "site": "ensolabs.ai",
+    "github": "github.com/nycsav"
+  },
   "resumes": {
-    "ai_builder": {
-      "file": "materials/resumes/Sav_Banerjee_Resume_ForwardDeployed_2026.pdf",
-      "_fixed_2026-06-03": "Was pointing at Sav_Banerjee_Resume_AI_Builder.pdf which does NOT exist on disk. Repointed to the ForwardDeployed resume (the technical builder variant that exists).",
-      "angle": "Technical AI builder + enterprise transformation leader. Leads with production AI products shipped (trading terminal, intelligence platform, CoE). Heavy on Claude/MCP architecture, financial AI agents, agentic systems.",
+    "forward_deployed": {
+      "file": "materials/resumes/Sav_Banerjee_ForwardDeployed.pdf",
+      "source": { "drive_file_id": "1qQwqhlDOs3WCQBJXssQRtg-oE_GejxKI", "drive_created": "2026-06-22T22:42:07Z", "drive_modified": "2026-06-24T11:42:47Z", "size_bytes": 152774, "ingested": "2026-06-24T13:22Z" },
+      "headline": "Forward-Deployed AI Architect · AI Transformation · Agentic Systems · Enterprise GTM",
+      "angle": "The most technical variant. Leads with hands-on production builds: agentic workflows on Claude + MCP, Google ADK / Managed Agents, LangGraph; autonomous financial AI agents; a 731-document enterprise intelligence platform. Frontier-platform builder (Google I/O 2026 partner). Use when the role wants someone who architects AND ships, embedded with client engineering.",
       "best_for": [
-        "Head of AI",
-        "VP AI",
-        "AI Transformation Lead",
-        "AI Architecture",
+        "Forward Deployed Engineer",
+        "Forward Deployed AI Engineer",
+        "AI Architect",
         "AI Solutions Architect",
-        "VP AI Solutions Architecture",
+        "Solutions Architect",
+        "Partner Solutions Architect",
         "Applied AI",
-        "Agentic Solutions Engineer",
-        "Internal AI Lead",
-        "Technology Head of AI",
-        "CTO / Chief Technology Officer",
-        "Chief AI Officer"
+        "Agentic Engineer",
+        "AI Solutions Engineer",
+        "Solutions Engineer",
+        "AI Engineer",
+        "GenAI Engineer",
+        "Customer Engineer"
       ],
-      "example_companies": ["Anthropic (technical roles)", "OpenAI (applied AI)", "Confluence", "Jecona", "Ladders", "Willis Re", "Soho Square", "Tribe AI"]
+      "example_companies": ["Anthropic (Applied AI/SA)", "OpenAI (FDE)", "Palantir", "Sierra", "Scale", "agentic-platform startups"]
     },
-    "ai_advisory": {
-      "file": "materials/resumes/Sav_Banerjee_Resume_2026_v3.pdf",
-      "angle": "Enterprise AI advisor + C-suite transformation consultant. Refreshed 2026-05-28 to 9+ format (metric strip, action-result bullets, blue palette). Leads with advisory practice, Fortune 500 manufacturer intelligence platform, Heller Center of Excellence, change management. More strategic, less technical.",
-      "best_for": [
-        "AI Transformation Consultant",
-        "AI Strategy Consultant",
-        "Digital Transformation Lead",
-        "Management Consultant (AI/Digital)",
-        "Chief Transformation Officer",
-        "VP Digital Transformation",
-        "AI Advisory",
-        "Enterprise AI Consultant",
-        "AI Center of Excellence Lead"
-      ],
-      "example_companies": ["McKinsey", "BCG", "Bain", "Cuesta Partners", "Deloitte", "Accenture", "PE-backed portcos"]
-    },
-    "ai_consulting": {
-      "file": "materials/resumes/Sav_Banerjee_Resume_2026_MD_ManagedServices.pdf",
-      "_added_2026-06-03": "New route for consulting / contract / fractional / Managed-Services roles (supports the >$85/hr contract track). Uses the MD/Managed-Services resume that existed on disk but was never mapped.",
-      "angle": "Managing-Director / fractional AI consulting. Leads with principal-led delivery, managed-services model, P&L of an AI studio, multi-client F500 delivery. Best for hourly/contract and boutique consulting engagements.",
+    "managed_services": {
+      "file": "materials/resumes/Sav_Banerjee_ManagedServices.pdf",
+      "source": { "drive_file_id": "1UXcLaVfNQ2rfwrdhfOTQuhyIeESySGey", "drive_created": "2026-06-22T22:46:36Z", "drive_modified": "2026-06-24T11:42:51Z", "size_bytes": 98904, "ingested": "2026-06-24T13:22Z" },
+      "headline": "AI Transformation · Managed Services · Agentic Systems",
+      "angle": "Advisory + managed-services / MD variant. Leads with a productized retainer practice (Claude Managed Services — offering, pricing, intake, delivery playbooks), MD-level delivery, and 'sell the roadmap then stand up the platform.' Best for consulting firms, fractional/contract, and managed-delivery mandates.",
       "best_for": [
         "AI Consultant",
-        "AI Deployment Strategist",
+        "Managing Director",
+        "Solutions Managing Director",
+        "Principal Consultant",
+        "Principal Technical Consultant",
+        "Management Consultant",
         "Fractional AI Lead",
-        "Contract AI Architect",
-        "Independent AI Consultant",
-        "Managed Services AI",
+        "Interim Head of AI",
+        "Managed Services",
         "AI Delivery Lead",
-        "Interim Head of AI"
+        "Consulting",
+        "Change Management Consultant",
+        "AI Practice Lead"
       ],
-      "example_companies": ["A.Team", "Catalant", "BTG", "Toptal", "Dice contract", "boutique consultancies"]
+      "example_companies": ["McKinsey", "BCG", "Bain", "Deloitte", "Accenture", "WWT", "TCS", "Cuesta", "boutique consultancies", "A.Team/Catalant/BTG"]
     },
-    "ai_partnerships": {
-      "file": "materials/resumes/Sav_Banerjee_Resume_2026_PMM_v2.pdf",
-      "_fixed_2026-06-03": "Was pointing at Sav_Banerjee_Resume_AI_Partnerships.pdf which does NOT exist on disk. No dedicated partnerships resume exists yet — temporarily routed to PMM_v2 (nearest GTM/relationship match). TODO: build a real partnerships resume.",
-      "angle": "Strategic AI partnerships executive. Leads with VP+ relationships, co-sell/channel enablement, go-to-market strategy. Claude/MCP technical depth as differentiator.",
+    "enterprise_growth": {
+      "file": "materials/resumes/Sav_Banerjee_EnterpriseGrowth.pdf",
+      "source": { "drive_file_id": "1irTr2OIwgtG9Bs4ZAhJXPclab4JbmPzo", "drive_created": "2026-06-22T22:47:23Z", "drive_modified": "2026-06-24T11:42:55Z", "size_bytes": 106506, "ingested": "2026-06-24T13:22Z" },
+      "headline": "Enterprise Growth & AI Strategy · Perplexity AI Business Fellow · 20+ Live Deployments",
+      "angle": "Growth / GTM / commercial variant. Leads with closing-and-expanding AI engagements, enterprise product demonstrations as proof-of-depth, BD and account growth, and moving deals first-conversation to production. Absorbs the old partnerships + product-marketing clusters. Best for GTM-engineer, sales-engineering, BD, partnerships, and growth roles.",
       "best_for": [
-        "Global Technology Partner Lead",
-        "Strategic Partnerships",
-        "Head of Partnerships",
-        "VP Partnerships",
-        "Business Development (AI platforms)",
-        "Alliance Manager",
-        "Channel Lead",
-        "Partner Solutions Architect",
-        "Head of AI Executive Partnership"
-      ],
-      "example_companies": ["Anthropic (partnerships)", "OpenAI (partnerships)", "Google DeepMind (partnerships)", "Salesforce", "Microsoft"]
-    },
-    "product_marketing": {
-      "file": "materials/resumes/Sav_Banerjee_Resume_2026_PMM_v2.pdf",
-      "angle": "Product marketing + Go-To-Market strategist. Refreshed 2026-05-28 to 9+ format. Leads with Perplexity Fellowship + 20+ production projects, product positioning, launch systems, competitive intelligence, enterprise buyer mapping. AI platform expertise as differentiator.",
-      "best_for": [
-        "Product Marketing Manager",
-        "Senior PMM",
-        "Head of Product Marketing",
-        "VP Product Marketing",
+        "GTM Engineer",
+        "Go-to-Market",
         "GTM Strategy",
-        "AI Product Manager",
-        "VP AI & Platforms",
-        "Forward Deployed AI",
-        "Growth Strategy",
-        "AI Accelerator"
+        "Product Marketing",
+        "Product Marketing Manager",
+        "PMM",
+        "Growth",
+        "Sales Engineer",
+        "Solutions Consultant",
+        "Pre-Sales",
+        "Business Development",
+        "Partnerships",
+        "Alliance Manager",
+        "Channel",
+        "Demand Generation",
+        "Commercial AI"
       ],
-      "example_companies": ["Stripe", "Veho", "Red Ventures", "Atrium", "Perplexity"]
+      "example_companies": ["Stripe", "Clay", "Perplexity (GTM)", "AI platform vendors", "Pacvue", "Veho", "Red Ventures"]
+    },
+    "ai_transformation": {
+      "file": "materials/resumes/Sav_Banerjee_Master.pdf",
+      "source": { "drive_file_id": "1qD9dqnfc7HLO37KxSa0YAoPgGb9ubtNp", "drive_created": "2026-06-22T22:47:43Z", "drive_modified": "2026-06-24T11:42:58Z", "size_bytes": 106453, "ingested": "2026-06-24T13:22Z" },
+      "_is_default": true,
+      "headline": "AI Transformation & Growth Strategy · Enterprise Advisory & Agentic AI Deployment",
+      "angle": "The generalist / master resume — balanced enterprise AI advisory + transformation strategy + growth, with hands-on credibility. The default when a role is broad AI leadership and doesn't clearly fit a more specialized variant.",
+      "best_for": [
+        "AI Transformation",
+        "AI Strategy",
+        "AI Strategy & Transformation",
+        "AI Strategy & Delivery",
+        "AI Strategy & Enablement",
+        "VP AI",
+        "Director AI",
+        "Head of AI",
+        "Chief AI Officer",
+        "AI Advisory",
+        "AI Advisory Leader",
+        "AI Enablement",
+        "Director, AI Enablement",
+        "AI Center of Excellence",
+        "Generative AI Enablement",
+        "Digital Transformation",
+        "Enterprise AI Strategy"
+      ],
+      "example_companies": ["Section", "FXI", "enterprise AI/strategy orgs", "F500 internal AI teams"]
     }
   },
   "matching_rules": {
-    "priority": "Match by title keywords first, then by company type, then by JD content analysis",
-    "default": "ai_builder",
+    "priority": "1) explicit Notion Resume Version → cluster (clusterFromVersion); 2) title keyword vs best_for, first match wins (order: forward_deployed, managed_services, enterprise_growth, ai_transformation); 3) default.",
+    "default": "ai_transformation",
     "excluded_companies": ["Perplexity", "BOI", "Board of Innovation"],
-    "notes": "These are Sav's pre-approved PDFs. Do NOT regenerate resumes. Pick the best match and submit the PDF as-is."
+    "legacy_version_aliases": {
+      "v3 / advisory / strategy / transformation / enablement / master": "ai_transformation",
+      "MD / managed services / fractional / consulting / consultant": "managed_services",
+      "ForwardDeployed / FDE / architect / applied / agentic / builder": "forward_deployed",
+      "PMM / product marketing / GTM / growth / partnerships / sales / solutions": "enterprise_growth",
+      "_note": "Old Notion rows used keys like 'v3', 'PMM_v2', 'ForwardDeployed', 'MD_ManagedServices' — these still route correctly to the new files."
+    },
+    "notes": "These are Sav's pre-approved PDFs. Do NOT regenerate resumes. Pick the best match and submit the PDF as-is. PDFs live in materials/resumes/ (gitignored). Place the 4 new files there on the Mac before submitting."
   }
 }

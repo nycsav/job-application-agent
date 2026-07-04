@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdir, appendFile } from 'fs/promises';
+import { mkdir, appendFile, readFile } from 'fs/promises';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { generateAllPending } from './agents/materials.mjs';
@@ -7,6 +7,7 @@ import { createSubmissionPlan, PLATFORM_STRATEGIES } from './agents/submitter.mj
 import { loadRoles } from './lib/template-engine.mjs';
 import { TARGET_COMPANIES, scoreRole } from './agents/scanner.mjs';
 import { scanSubstack } from './agents/substack-scanner.mjs';
+import { runManager } from './agents/manager.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
@@ -122,13 +123,32 @@ async function runFull() {
   }
 }
 
+/**
+ * Manager mode — the parallel orchestrator (docs/parallel-agent-architecture.html).
+ * Live: Claude Code calls runManager(ctx) with MCP-backed source specialists +
+ * the current Notion rows, then performs the keyed notion-create-pages writes.
+ * CLI: replays reports/parallel-scan-fixture.json so the full path is verifiable.
+ */
+async function runManagerMode() {
+  console.log('\n=== MANAGER — parallel discovery → score → keyed dedup → tailor → stage → GATE ===');
+  let fixture = [];
+  try { fixture = JSON.parse(await readFile(join(ROOT, 'fixtures', 'parallel-scan-fixture.json'), 'utf8')); }
+  catch { console.log('No fixture present. In live use, Claude Code injects MCP source specialists.'); return; }
+  const ctx = { specialists: { fixture: { label: 'fixture replay', run: async () => fixture } } };
+  const out = await runManager(ctx, {});
+  const l = out.runLog;
+  console.log(`scanned ${l.scanned} · staged ${l.staged} · click-ready ${l.clickReady} · needs-you ${l.needsYou} · dedup-skipped ${l.duplicatesSkipped}`);
+  console.log(`🔒 GATE owned — nothing submits without Sav. For the full report run: node agents/manager.mjs`);
+}
+
 const mode = process.argv[2] || '--status';
 switch (mode) {
   case '--scan':    console.log('Scanner requires Claude Code Routine with web_fetch.'); break;
   case '--scan-substack': runSubstackScan().catch(console.error); break;
+  case '--manager': runManagerMode().catch(console.error); break;
   case '--generate': generateAllPending().then(r => console.log(`Generated ${r.length} material sets.`)).catch(console.error); break;
   case '--submit':  console.log('Submitter requires Claude Code with Playwright MCP.'); break;
   case '--full':    runFull().catch(console.error); break;
   case '--status':  showStatus().catch(console.error); break;
-  default: console.log('Usage: node orchestrator.mjs [--scan|--scan-substack|--generate|--submit|--full|--status]');
+  default: console.log('Usage: node orchestrator.mjs [--scan|--scan-substack|--manager|--generate|--submit|--full|--status]');
 }
