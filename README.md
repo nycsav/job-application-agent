@@ -1,5 +1,28 @@
 # Job Application Agent
 
+> **⚠️ STATUS — 2026-07-22: This repo is legacy/dev. The live production engine is elsewhere, and it WORKS.**
+>
+> The operating job-search system is the Claude Code **`job-sweep-daily`** scheduled task + the
+> **`CLAUDECODEJOBSWEEP.md`** per-site apply wrapper, governed by **`ensolabs-site/CLAUDE.md`**
+> (NY-only, comp floors, **7.01–8.9 auto-submit / 9.0+ human-gate**, hard-stops, signature rule).
+> It runs on the Mac with a *persistent logged-in Chrome* and submits to employer ATS directly.
+> As of 2026-07-22 the Notion Career Command Center shows **55 Applied · 1 Interview (Runway ML) ·
+> 8 Approved · 56 Materials Ready**.
+>
+> Earlier notes in this repo that called autonomous submission "a mirage" were **wrong** — they
+> reasoned from this stale repo + a browserless cloud session, not the live engine. Correction:
+> gated auto-submit works on Claude Code + persistent Chrome, within the hard-stops (never create
+> accounts, enter passwords, solve CAPTCHAs, auto-submit 9.0+, or apply to SF/relocation roles).
+>
+> **Canonical sources win; this repo defers to them — do not drift.** Reusable pieces kept here:
+> `lib/dedup.mjs` (shared dedup key), `lib/resume-picker.mjs`, `lib/notion-queue.mjs`,
+> `patches/notion-career-agent-dedup.patch`.
+>
+> **Real open issue:** ~40 *tracking*-duplicate clusters in Notion (a role logged 2–4× from
+> receipt/backfill/scan without a dedup key at creation) — **not** employer double-applies
+> (verified: Cohere was 1 application tracked 3×). Fix = apply `lib/dedup.mjs` at row-creation in
+> the engine, not manual board surgery.
+
 An automated job application pipeline built on Claude Code that scans job boards, scores roles against your profile, generates tailored materials, and submits applications — with human-in-the-loop approval before every submission.
 
 ## Why this exists
