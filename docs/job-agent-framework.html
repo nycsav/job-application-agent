@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job Application Agent — How It Works</title>
+<style>
+  :root{
+    --ink:#0e1726; --blue:#2563eb; --blue-deep:#1e3a8a; --amber:#f59e0b;
+    --amber-deep:#b45309; --slate:#475569; --line:#cbd5e1; --bg:#f6f8fb; --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.4;padding:40px 24px}
+  .wrap{max-width:1060px;margin:0 auto}
+  h1{font-size:30px;margin:0 0 4px;letter-spacing:-.5px}
+  .sub{font-size:17px;color:var(--slate);margin:0 0 28px}
+  .big{font-size:21px;font-weight:700;margin:0 0 22px;padding:16px 20px;border-left:5px solid var(--amber);
+    background:#fff7ec;border-radius:8px}
+  .big b{color:var(--amber-deep)}
+  .lanes{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:8px}
+  .lane{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 8px;
+    box-shadow:0 1px 3px rgba(15,30,50,.06)}
+  .lane h2{display:flex;align-items:center;gap:10px;font-size:15px;text-transform:uppercase;letter-spacing:.6px;margin:0 0 4px}
+  .tag{font-size:11px;font-weight:700;color:#fff;padding:3px 9px;border-radius:20px}
+  .tag.cloud{background:var(--blue)} .tag.local{background:var(--amber-deep)}
+  .lane .where{font-size:13px;color:var(--slate);margin:0 0 14px}
+  .step{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px dashed var(--line)}
+  .step:first-of-type{border-top:none}
+  .num{flex:0 0 26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;color:#fff;margin-top:1px}
+  .cloud .num{background:var(--blue)} .local .num{background:var(--amber-deep)}
+  .step .t{font-weight:700;font-size:14px} .step .d{font-size:13px;color:var(--slate)}
+  .gate{margin:18px 0;background:var(--ink);color:#fff;border-radius:14px;padding:18px 22px;
+    display:flex;align-items:center;gap:16px}
+  .gate .lock{font-size:30px}
+  .gate .gt{font-size:16px;font-weight:800;letter-spacing:.3px}
+  .gate .gd{font-size:13px;color:#c7d2e6}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin:6px 0 26px;
+    background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
+  .pill{font-size:13px;font-weight:600;padding:8px 13px;border-radius:10px;border:1.5px solid}
+  .pill.b{color:var(--blue-deep);border-color:#bfdbfe;background:#eff6ff}
+  .pill.g{color:#fff;background:var(--ink);border-color:var(--ink)}
+  .pill.a{color:var(--amber-deep);border-color:#fde2b3;background:#fff7ec}
+  .arrow{color:var(--slate);font-weight:700}
+  .why{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+  .why .c{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff}
+  .why .c h3{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--amber-deep)}
+  .why .c p{margin:0;font-size:13px;color:var(--slate)}
+  .foot{margin-top:24px;font-size:12px;color:var(--slate);text-align:center}
+  @media(max-width:720px){.lanes,.why{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Job Application Agent</h1>
+  <p class="sub">Two engines, one human gate — how the daily run actually works.</p>
+
+  <div class="big">Claude <b>finds &amp; picks</b> the jobs in the cloud. You <b>approve</b> in one screen.
+  A runner on your Mac <b>applies &amp; files</b>. No application is ever submitted without your OK.</div>
+
+  <div class="lanes">
+    <!-- CLOUD ENGINE -->
+    <div class="lane cloud">
+      <h2>Engine 1 · Collect &amp; Pick <span class="tag cloud">CLOUD · Claude</span></h2>
+      <p class="where">Runs here (Claude), twice a day. Read-only on your inbox &amp; job boards.</p>
+      <div class="step"><div class="num">1</div><div><div class="t">Scan</div><div class="d">Enso Gmail (Ladders, LinkedIn alerts) + Indeed + Dice</div></div></div>
+      <div class="step"><div class="num">2</div><div><div class="t">Score &amp; dedup</div><div class="d">Rank 0–10 vs your profile · skip anything already in Notion</div></div></div>
+      <div class="step"><div class="num">3</div><div><div class="t">Stage to Notion</div><div class="d">"Ready to Apply" queue · right resume variant + apply link per role</div></div></div>
+    </div>
+
+    <!-- LOCAL ENGINE -->
+    <div class="lane local">
+      <h2>Engine 2 · Apply &amp; File <span class="tag local">LOCAL · your Mac</span></h2>
+      <p class="where">Runs on your Mac, where the browser &amp; your logins live (Playwright daemon).</p>
+      <div class="step"><div class="num">4</div><div><div class="t">Open the form</div><div class="d">Drives the real ATS — Greenhouse, Ashby, Lever, Workday, Ladders</div></div></div>
+      <div class="step"><div class="num">5</div><div><div class="t">Fill from your profile</div><div class="d">Verified metrics + tailored resume &amp; cover letter — never fabricated</div></div></div>
+      <div class="step"><div class="num">6</div><div><div class="t">File it back</div><div class="d">Email → <b>AI-Applied</b> folder · Notion → Applied · Calendar logged</div></div></div>
+    </div>
+  </div>
+
+  <div class="gate">
+    <div class="lock">&#128274;</div>
+    <div>
+      <div class="gt">THE GATE — you approve before any submit</div>
+      <div class="gd">Between Engine 1 and Engine 2. One-screen review in Notion. This is the rule the whole system is built around.</div>
+    </div>
+  </div>
+
+  <div class="flow">
+    <span class="pill b">Scan</span><span class="arrow">→</span>
+    <span class="pill b">Score + Dedup</span><span class="arrow">→</span>
+    <span class="pill b">Stage to Notion</span><span class="arrow">→</span>
+    <span class="pill g">&#128274; You approve</span><span class="arrow">→</span>
+    <span class="pill a">Apply (Mac)</span><span class="arrow">→</span>
+    <span class="pill a">File: Email + Notion + Calendar</span>
+  </div>
+
+  <div class="why">
+    <div class="c">
+      <h3>Why not "apply from here"</h3>
+      <p>This cloud session can read your email and write Notion, but it has no web browser. Submitting a job form needs a logged-in browser — that lives on your Mac.</p>
+    </div>
+    <div class="c">
+      <h3>Why not Notion Agents</h3>
+      <p>Notion Agents automate work inside Notion. They can't drive an outside employer's application form either — so the apply step still belongs to the Mac runner.</p>
+    </div>
+  </div>
+
+  <p class="foot">Cloud = blue (find &amp; pick) · Local Mac = amber (apply &amp; file) · Black = the human gate. Nothing submits without you.</p>
+</div>
+</body>
+</html>

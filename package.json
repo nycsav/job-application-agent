@@ -7,6 +7,8 @@
     "scan": "node agents/scanner.mjs",
     "generate": "node agents/materials.mjs",
     "submit": "node agents/submitter.mjs",
+    "submit:notion": "node agents/notion-submitter.mjs",
+    "queue:notion": "node lib/notion-queue.mjs Approved",
     "pipeline": "node orchestrator.mjs",
     "test": "node lib/test-templates.mjs",
     "scan:personal": "node agents/personal-gmail-scanner.mjs",
@@ -23,6 +25,7 @@
     "daemon:status": "launchctl list | grep com.sav.job-apply-daemon"
   },
   "dependencies": {
+    "@notionhq/client": "^2.2.15",
     "docx": "^9.1.1",
     "googleapis": "^144.0.0",
     "playwright": "^1.48.0"

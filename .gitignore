@@ -10,6 +10,9 @@ materials/resumes/*.pdf
 materials/cover-letters/*.pdf
 materials/test-run/
 
+# Expert-network answer bank (career history, client list, rate) — local only
+GUIDEPOINT-ANSWER-BANK.md
+
 # Google API credentials / tokens
 credentials.json
 token.json
